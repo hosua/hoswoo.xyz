@@ -5,6 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "update-submodules": "git submodule update --init --recursive --remote --merge",
+    "build-games": "bash build-games.sh",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"

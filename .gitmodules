@@ -1,0 +1,15 @@
+[submodule "games/shermie-invaders"]
+	path = games/shermie-invaders
+	url = https://github.com/hosua/shermie-invaders
+[submodule "games/sdl2-pathfinder"]
+	path = games/sdl2-pathfinder
+	url = https://github.com/hosua/sdl2-pathfinder
+[submodule "games/SnakePlusPlus"]
+	path = games/SnakePlusPlus
+	url = https://github.com/hosua/SnakePlusPlus
+[submodule "games/FlapPy-bird"]
+	path = games/FlapPy-bird
+	url = https://github.com/hosua/FlapPy-bird
+[submodule "games/TetriPy"]
+	path = games/TetriPy
+	url = https://github.com/hosua/TetriPy

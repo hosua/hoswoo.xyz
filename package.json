@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "update-submodules": "git submodule update --init --recursive --remote --merge",
+    "clean-games": "rm -rf public/games; rm -rf games",
     "build-games": "bash build-games.sh",
     "build": "tsc -b && vite build",
     "lint": "eslint .",

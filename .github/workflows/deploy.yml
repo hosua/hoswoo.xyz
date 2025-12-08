@@ -26,12 +26,14 @@ jobs:
           cd emsdk
           ./emsdk install latest
           ./emsdk activate latest
-          source ./emsdk_env.sh
 
       - name: Rebuild all games and deploy to S3
         env:
           BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         run: |
+          echo "Setting up Emscripten environment..."
+          source ./emsdk/emsdk_env.sh
+          
           echo "Rebuilding all games..."
           npm run clean-games
           npm run build-games
@@ -41,5 +43,5 @@ jobs:
 
           echo "Uploading files to S3..."
           npm run deploy   
-
+          
           echo "Done!"

@@ -1,6 +1,9 @@
 #!/bin/bash
 
-. .env
+if [ -f ../.env ]; then
+  echo "Loading local .env values..."
+  . ../.env
+fi
 
 BUILD_DIR="dist/"
 

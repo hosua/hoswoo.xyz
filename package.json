@@ -7,9 +7,9 @@
     "dev": "vite",
     "update-submodules": "git submodule update --init --recursive --remote --merge",
     "clean-games": "rm -rf public/games; rm -rf games",
-    "build-games": "bash build-games.sh",
+    "build-games": "bash scripts/build-games.sh",
     "build": "tsc -b && vite build",
-    "deploy": "bash deploy.sh",
+    "deploy": "bash scripts/deploy.sh",
     "lint": "eslint .",
     "preview": "vite preview"
   },

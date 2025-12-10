@@ -28,7 +28,7 @@ export const handler = async (event) => {
     },
   });
 
-  db.send(putItem);
+  await db.send(putItem);
 
   const response = {
     statusCode: 200,

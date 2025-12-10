@@ -10,6 +10,7 @@
     "build-games": "bash scripts/build-games.sh",
     "build": "tsc -b && vite build",
     "deploy": "bash scripts/deploy.sh",
+    "deploy-lambdas": "bash scripts/deploy-lambdas.sh",
     "lint": "eslint .",
     "preview": "vite preview"
   },

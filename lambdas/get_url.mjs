@@ -16,7 +16,21 @@ export const handler = async (event) => {
     },
   });
 
-  const response = await db.send(getItem);
-  console.log(response);
-  return response;
+  const res = await db.send(getItem);
+  if (!res) {
+    return {
+      statusCode: 404,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ error: "URL not found" }),
+    };
+  }
+  return {
+    statusCode: 200,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(result.Item),
+  };
 };

@@ -30,9 +30,11 @@ export const handler = async (event) => {
 
   await db.send(putItem);
 
-  const response = {
+  return {
     statusCode: 200,
-    short_url,
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ short_url }),
   };
-  return response;
 };

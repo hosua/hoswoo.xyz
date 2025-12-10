@@ -13,8 +13,8 @@ interface GetUrlResponse {
 }
 
 export const shortenUrl = async ({ originalUrl }: { originalUrl: string }) => {
-  console.log("API_BASE_URL:", API_BASE_URL);
-  const response = await fetch(`${API_BASE_URL}/url`, {
+  const url = `${API_BASE_URL}/url`;
+  const response = await fetch(url, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

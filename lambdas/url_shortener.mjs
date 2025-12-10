@@ -8,8 +8,7 @@ const client = new DynamoDBClient({ region });
 const db = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
-  const { original_url } = event;
-
+  const { original_url } = JSON.parse(event.body || {});
   const short_url = randomBytes(8).toString("base64url");
 
   // TTL = 24 hours

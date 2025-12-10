@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Link2, CheckCircle2, Copy } from "lucide-react";
+import { Link2, CheckCircle2, Copy, AlertTriangle } from "lucide-react";
+import { toast } from "sonner";
 import { shortenUrl } from "@/lib/urlShortener";
 
 export const UrlShortenerPage = () => {
@@ -36,6 +37,7 @@ export const UrlShortenerPage = () => {
   const handleCopy = async () => {
     if (shortenedUrl) {
       await navigator.clipboard.writeText(shortenedUrl);
+      toast.success("URL copied to clipboard");
     }
   };
 
@@ -73,20 +75,28 @@ export const UrlShortenerPage = () => {
         )}
 
         {shortenedUrl && (
-          <Alert>
-            <CheckCircle2 className="text-green-600" />
-            <AlertDescription className="flex items-center justify-between gap-2">
-              <span className="break-all">{shortenedUrl}</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleCopy}
-                className="shrink-0"
-              >
-                <Copy className="size-4" />
-              </Button>
-            </AlertDescription>
-          </Alert>
+          <div className="space-y-2">
+            <Alert>
+              <CheckCircle2 className="text-green-600" />
+              <AlertDescription className="flex items-center justify-between gap-2">
+                <span className="break-all">{shortenedUrl}</span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleCopy}
+                  className="shrink-0"
+                >
+                  <Copy className="size-4" />
+                </Button>
+              </AlertDescription>
+            </Alert>
+            <Alert variant="default">
+              <AlertTriangle className="text-yellow-600" />
+              <AlertDescription>
+                Shortened URLs expire after 24 hours.
+              </AlertDescription>
+            </Alert>
+          </div>
         )}
       </div>
     </div>

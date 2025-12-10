@@ -7,8 +7,7 @@ const client = new DynamoDBClient({ region });
 const db = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
-  const { short_url } = event;
-
+  const { short_url } = event.queryStringParameters;
   const getItem = new GetCommand({
     TableName: table_name,
     Key: {

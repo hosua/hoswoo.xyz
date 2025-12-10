@@ -20,7 +20,11 @@ if [ -d "$BUILD_DIR" ]; then
   echo "Uploading new bucket files..."
   aws s3 cp . s3://"$BUCKET_NAME" --recursive
   echo "Invalidating CloudFront cache..."
-  aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" --paths "/*"
+  aws cloudfront create-invalidation \
+    --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
+    --paths "/*" \
+    --no-cli-pager
+
 else
   echo "Error: dist folder not found. Run npm build first!"
 fi

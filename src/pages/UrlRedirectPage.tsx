@@ -28,6 +28,7 @@ export const UrlRedirectPage = () => {
 
         window.location.href = data.original_url;
       } catch (err) {
+        console.error(err);
         setError(true);
         setLoading(false);
       }

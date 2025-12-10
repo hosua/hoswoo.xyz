@@ -32,7 +32,7 @@ export const handler = async (event) => {
 
   const response = {
     statusCode: 200,
-    body: `Your generated url code is: ${short_url}`,
+    short_url,
   };
   return response;
 };

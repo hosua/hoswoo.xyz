@@ -5,9 +5,20 @@ import { Button } from "./ui/button";
 export const NavBar = () => {
   return (
     <nav className="flex items-center justify-between border-b px-4 py-3">
-      <Button variant="ghost" asChild>
-        <Link to="/">hoswoo.xyz</Link>
-      </Button>
+      <div className="flex items-center gap-2">
+        <Link
+          to="/"
+          className="font-semibold h-9 inline-flex items-center -mt-1.25"
+        >
+          hoswoo.xyz
+        </Link>
+        <Button variant="ghost" asChild>
+          <Link to="/">Games</Link>
+        </Button>
+        <Button variant="ghost" asChild>
+          <Link to="/url-shortener">URL Shortener</Link>
+        </Button>
+      </div>
       <ThemeSwitcher />
     </nav>
   );

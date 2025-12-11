@@ -12,8 +12,7 @@ export const GamesPage = () => {
           This page showcases some of the games I've made for fun.
         </p>
         <p className="text-muted-foreground">
-          Some are more polished than others, but I'm proud of all of them and
-          miss working with C++ dearly.
+          Some are more polished than others, but I'm proud of them all.
         </p>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

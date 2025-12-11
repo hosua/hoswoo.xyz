@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -e # Exit on error
-set -x # Print commands as they execute
 
 npm i
 npm run update-submodules
@@ -17,77 +16,24 @@ popd || exit
 echo Building games to \""$BUILD_DIR"\"...
 pushd "$GAMES_DIR" || exit
 
-echo "=== Building TetriPy ==="
+echo Building TetriPy...
 pushd TetriPy || exit
-echo "Current directory: $(pwd)"
-echo "Sourcing init-venv.sh..."
-. init-venv.sh || {
-  echo "ERROR: Failed to source init-venv.sh"
-  exit 1
-}
-echo "init-venv.sh sourced successfully"
-echo "Running build-web.sh for TetriPy..."
-./build-web.sh || {
-  echo "ERROR: build-web.sh failed with exit code $?"
-  exit 1
-}
-echo "build-web.sh completed successfully"
-echo "Checking if build/web exists..."
-if [ -d "build/web" ]; then
-  echo "✓ build/web directory found"
-  echo "Copying TetriPy build files..."
-  mkdir -p "$BUILD_DIR"/TetriPy/web
-  cp -r build/web/. "$BUILD_DIR"/TetriPy/web/
-  echo "TetriPy files copied successfully"
-  ls -la "$BUILD_DIR"/TetriPy/web/ | head -10
-else
-  echo "ERROR: build/web directory not found for TetriPy!"
-  echo "Current directory: $(pwd)"
-  echo "Contents of TetriPy directory:"
-  ls -la
-  echo "Checking for build directory:"
-  ls -la build/ 2>&1 || echo "build/ does not exist"
-  exit 1
-fi
-deactivate || true
+. init-venv.sh
+./build-web.sh
+mkdir -p "$BUILD_DIR"/TetriPy/web
+cp -r build/web/. "$BUILD_DIR"/TetriPy/web/
+deactivate
 popd || exit
 
-echo "=== Building FlapPy-bird ==="
+echo Building FlapPy-bird...
 pushd FlapPy-bird || exit
-echo "Current directory: $(pwd)"
-echo "Sourcing init-venv.sh..."
-. init-venv.sh || {
-  echo "ERROR: Failed to source init-venv.sh"
-  exit 1
-}
-echo "init-venv.sh sourced successfully"
-echo "Running build-web.sh for FlapPy-bird..."
-./build-web.sh || {
-  echo "ERROR: build-web.sh failed with exit code $?"
-  exit 1
-}
-echo "build-web.sh completed successfully"
-echo "Checking if build/web exists..."
-if [ -d "build/web" ]; then
-  echo "✓ build/web directory found"
-  echo "Copying FlapPy-bird build files..."
-  mkdir -p "$BUILD_DIR"/FlapPy-bird/web
-  cp -r build/web/. "$BUILD_DIR"/FlapPy-bird/web/
-  echo "FlapPy-bird files copied successfully"
-  ls -la "$BUILD_DIR"/FlapPy-bird/web/ | head -10
-else
-  echo "ERROR: build/web directory not found for FlapPy-bird!"
-  echo "Current directory: $(pwd)"
-  echo "Contents of FlapPy-bird directory:"
-  ls -la
-  echo "Checking for build directory:"
-  ls -la build/ 2>&1 || echo "build/ does not exist"
-  exit 1
-fi
-deactivate || true
+. init-venv.sh
+./build-web.sh
+mkdir -p "$BUILD_DIR"/FlapPy-bird/web
+cp -r build/web/. "$BUILD_DIR"/FlapPy-bird/web/
+echo "FlapPy-bird files copied successfully"
+deactivate
 popd || exit
-
-exit # TODO: REMOVE ME
 
 echo Building sdl2-pathfinder...
 pushd sdl2-pathfinder || exit

@@ -39,3 +39,21 @@ aws lambda update-function-code \
 rm ./*.zip
 
 popd
+
+# Deploy ip visitor lambdas
+pushd IPVisitorCounter || exit
+
+echo "Uploading and publishing IP Vistor counter Lambda..."
+zip ip_visitor.zip ip_visitor_counter.mjs
+aws lambda update-function-code \
+  --function-name "$LAMBDA_IP_VISITOR_COUNTER" \
+  --zip-file fileb://ip_visitor.zip \
+  --no-cli-pager &&
+  aws lambda wait function-updated \
+    --function-name "$LAMBDA_IP_VISITOR_COUNTER" &&
+  aws lambda publish-version \
+    --function-name "$LAMBDA_IP_VISITOR_COUNTER" \
+    --no-cli-pager
+
+rm ./*.zip
+popd

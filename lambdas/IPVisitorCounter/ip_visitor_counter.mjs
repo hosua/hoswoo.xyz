@@ -12,7 +12,7 @@ const client = new DynamoDBClient({ region });
 const db = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event) => {
-  const { ip } = event;
+  const { ip } = JSON.parse(event.body || {});
 
   const getItem = new GetCommand({
     TableName: table_name,

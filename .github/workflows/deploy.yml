@@ -41,7 +41,7 @@ jobs:
           npm run build-games
 
       - name: Tree check
-        run: tree -L 3 -I node_modules
+        run: tree -I node_modules
 
       - name: Build frontend
         run: |

@@ -23,31 +23,27 @@ export const handler = async (event) => {
 
   const { Item } = await db.send(getItem);
 
-  let cmd;
-
-  if (!Item) {
-    cmd = new PutCommand({
-      TableName: table_name,
-      Item: {
-        ip,
-        count: 1,
-      },
-    });
-  } else {
-    cmd = new UpdateCommand({
-      TableName: table_name,
-      Key: {
-        ip,
-      },
-      UpdateExpression: "ADD #count :increment",
-      ExpressionAttributeNames: {
-        "#count": "count",
-      },
-      ExpressionAttributeValues: {
-        ":increment": 1,
-      },
-    });
-  }
+  const cmd = !Item
+    ? new PutCommand({
+        TableName: table_name,
+        Item: {
+          ip,
+          count: 1,
+        },
+      })
+    : new UpdateCommand({
+        TableName: table_name,
+        Key: {
+          ip,
+        },
+        UpdateExpression: "ADD #count :increment",
+        ExpressionAttributeNames: {
+          "#count": "count",
+        },
+        ExpressionAttributeValues: {
+          ":increment": 1,
+        },
+      });
 
   await db.send(cmd);
 

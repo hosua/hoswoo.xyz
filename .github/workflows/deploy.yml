@@ -32,8 +32,6 @@ jobs:
         run: pip install pygbag pygame
 
       - name: Build all games
-        env:
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         run: |
           echo "Setting up Emscripten environment..."
           source ./emsdk/emsdk_env.sh
@@ -45,12 +43,14 @@ jobs:
           ls ./public/games
 
       - name: Build frontend
-          run: |
-            echo "Building react app..."
-            npm run build
+        run: |
+          echo "Building react app..."
+          npm run build
 
       - name: Deploy
-          run: | 
-            echo "Deploying files to S3..."
-            npm run deploy   
-            echo "Done!"
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        run: | 
+          echo "Deploying files to S3..."
+          npm run deploy   
+          echo "Done!"

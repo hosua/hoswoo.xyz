@@ -48,10 +48,10 @@ jobs:
           echo "Building react app..."
           npm run build
 
-      - name: Deploy
-        env:
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-        run: | 
-          echo "Deploying files to S3..."
-          npm run deploy   
-          echo "Done!"
+        # - name: Deploy
+        #   env:
+        #     BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+        #   run: | 
+        #     echo "Deploying files to S3..."
+        #     npm run deploy   
+        #     echo "Done!"

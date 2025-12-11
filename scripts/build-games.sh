@@ -25,6 +25,8 @@ cp -r build/web/. "$BUILD_DIR"/TetriPy/web/
 deactivate
 popd || exit
 
+exit 0 # TODO: Remove me
+
 echo Building FlapPy-bird...
 pushd FlapPy-bird || exit
 . init-venv.sh

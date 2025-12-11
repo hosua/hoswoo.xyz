@@ -11,6 +11,7 @@
     "build": "tsc -b && vite build",
     "deploy": "bash scripts/deploy.sh",
     "deploy-lambdas": "bash scripts/deploy-lambdas.sh",
+    "invalidate-cloudfront-cache": "bash scripts/invalidate-cloudfront-cache.sh",
     "lint": "eslint .",
     "preview": "vite preview"
   },

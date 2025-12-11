@@ -20,7 +20,7 @@ if [ -d "$BUILD_DIR" ]; then
   echo "Clearing games from s3..."
   aws s3 rm "$S3_BUCKET_URI/games" \
     --recursive \
-    --exclude "games/"
+    --exclude "games/*"
   pushd "$BUILD_DIR" || exit
 
   echo "Uploading games to s3..."

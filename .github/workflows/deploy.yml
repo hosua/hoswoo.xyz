@@ -40,7 +40,10 @@ jobs:
           npm run clean-games
           npm run build-games
 
-          ls ./public/games
+      - name: Tree check
+        run: |
+          sudo apt install tree
+          tree
 
       - name: Build frontend
         run: |

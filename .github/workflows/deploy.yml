@@ -18,12 +18,20 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Emscripten
-        run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install 4.0.20
-          ./emsdk activate 4.0.20
+            # - name: Install Emscripten
+            #   run: |
+            #     git clone https://github.com/emscripten-core/emsdk.git
+            #     cd emsdk
+            #     ./emsdk install 4.0.20
+            #     ./emsdk activate 4.0.20
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v14
+        with:
+          version: 4.0.20
+          actions-cache-folder: 'emsdk-cache'
+
+      - name: Verify emsdk
+        run: emcc -v
 
       - name: Setup Python
         uses: actions/setup-python@v5

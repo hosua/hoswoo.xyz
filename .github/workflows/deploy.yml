@@ -31,7 +31,7 @@ jobs:
       - name: Install python dependencies
         run: pip install pygbag pygame
 
-      - name: Rebuild all games and deploy to S3
+      - name: Build all games
         env:
           BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
         run: |
@@ -42,10 +42,15 @@ jobs:
           npm run clean-games
           npm run build-games
 
-          echo "Building react app..."
-          npm run build
+          ls ./public/games
 
-          echo "Uploading files to S3..."
-          npm run deploy   
-          
-          echo "Done!"
+      - name: Build frontend
+          run: |
+            echo "Building react app..."
+            npm run build
+
+      - name: Deploy
+          run: | 
+            echo "Deploying files to S3..."
+            npm run deploy   
+            echo "Done!"

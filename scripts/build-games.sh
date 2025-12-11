@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -e # Exit on error
+set -x # Print commands as they execute
 
 npm i
 npm run update-submodules
@@ -16,18 +17,24 @@ popd || exit
 echo Building games to \""$BUILD_DIR"\"...
 pushd "$GAMES_DIR" || exit
 
-echo Building TetriPy...
+echo "=== Building TetriPy ==="
 pushd TetriPy || exit
-. init-venv.sh
+echo "Current directory: $(pwd)"
+echo "Sourcing init-venv.sh..."
+. init-venv.sh || {
+  echo "ERROR: Failed to source init-venv.sh"
+  exit 1
+}
+echo "init-venv.sh sourced successfully"
 echo "Running build-web.sh for TetriPy..."
-if ./build-web.sh; then
-  echo "build-web.sh completed successfully"
-else
+./build-web.sh || {
   echo "ERROR: build-web.sh failed with exit code $?"
   exit 1
-fi
+}
+echo "build-web.sh completed successfully"
 echo "Checking if build/web exists..."
 if [ -d "build/web" ]; then
+  echo "✓ build/web directory found"
   echo "Copying TetriPy build files..."
   mkdir -p "$BUILD_DIR"/TetriPy/web
   cp -r build/web/. "$BUILD_DIR"/TetriPy/web/
@@ -45,18 +52,24 @@ fi
 deactivate || true
 popd || exit
 
-echo Building FlapPy-bird...
+echo "=== Building FlapPy-bird ==="
 pushd FlapPy-bird || exit
-. init-venv.sh
+echo "Current directory: $(pwd)"
+echo "Sourcing init-venv.sh..."
+. init-venv.sh || {
+  echo "ERROR: Failed to source init-venv.sh"
+  exit 1
+}
+echo "init-venv.sh sourced successfully"
 echo "Running build-web.sh for FlapPy-bird..."
-if ./build-web.sh; then
-  echo "build-web.sh completed successfully"
-else
+./build-web.sh || {
   echo "ERROR: build-web.sh failed with exit code $?"
   exit 1
-fi
+}
+echo "build-web.sh completed successfully"
 echo "Checking if build/web exists..."
 if [ -d "build/web" ]; then
+  echo "✓ build/web directory found"
   echo "Copying FlapPy-bird build files..."
   mkdir -p "$BUILD_DIR"/FlapPy-bird/web
   cp -r build/web/. "$BUILD_DIR"/FlapPy-bird/web/
@@ -73,6 +86,8 @@ else
 fi
 deactivate || true
 popd || exit
+
+exit # TODO: REMOVE ME
 
 echo Building sdl2-pathfinder...
 pushd sdl2-pathfinder || exit

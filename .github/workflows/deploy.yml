@@ -21,17 +21,19 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Install Emscripten
-        run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          ./emsdk install latest
-          ./emsdk activate latest
+      # - name: Install Emscripten
+      #   run: |
+      #     git clone https://github.com/emscripten-core/emsdk.git
+      #     cd emsdk
+      #     ./emsdk install latest
+      #     ./emsdk activate latest
 
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.13"
+        run: |
+          pip install pygame pygbag
 
       - name: Build all games
         run: |

@@ -18,23 +18,34 @@ pushd "$GAMES_DIR" || exit
 
 echo Building TetriPy...
 pushd TetriPy || exit
-. init-venv.sh
+if ! pip list | grep -q pygbag; then
+  . init-venv.sh
+  VENV_ACTIVATED=1
+fi
 ./build-web.sh
 mkdir -p "$BUILD_DIR"/TetriPy/web
 cp -r build/web/. "$BUILD_DIR"/TetriPy/web/
-deactivate
+if [ -n "$VENV_ACTIVATED" ]; then
+  deactivate
+  unset VENV_ACTIVATED
+fi
 popd || exit
 
 exit 0 # TODO: Remove me
 
 echo Building FlapPy-bird...
 pushd FlapPy-bird || exit
-. init-venv.sh
+if ! pip list | grep -q pygbag; then
+  . init-venv.sh
+  VENV_ACTIVATED=1
+fi
 ./build-web.sh
 mkdir -p "$BUILD_DIR"/FlapPy-bird/web
 cp -r build/web/. "$BUILD_DIR"/FlapPy-bird/web/
-echo "FlapPy-bird files copied successfully"
-deactivate
+if [ -n "$VENV_ACTIVATED" ]; then
+  deactivate
+  unset VENV_ACTIVATED
+fi
 popd || exit
 
 echo Building sdl2-pathfinder...

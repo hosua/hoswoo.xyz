@@ -20,6 +20,6 @@ jobs:
 
       - name: Deploy Lambdas
         env: 
-          LAMBDA_GET_URL: ${{ env.LAMBDA_GET_URL }}
-          LAMBDA_URL_SHORTENER: ${{ env.LAMBDA_URL_SHORTENER }}
+          LAMBDA_GET_URL: ${{ vars.LAMBDA_GET_URL }}
+          LAMBDA_URL_SHORTENER: ${{ vars.LAMBDA_URL_SHORTENER }}
         run: npm run deploy-lambdas

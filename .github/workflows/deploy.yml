@@ -28,8 +28,10 @@ jobs:
           ./emsdk install latest
           ./emsdk activate latest
 
-      - name: Install python dependencies
-        run: pip install pygbag pygame
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
 
       - name: Build all games
         run: |

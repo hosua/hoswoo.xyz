@@ -31,8 +31,6 @@ if [ -n "$VENV_ACTIVATED" ]; then
 fi
 popd || exit
 
-exit 0 # TODO: Remove me
-
 echo Building FlapPy-bird...
 pushd FlapPy-bird || exit
 if ! pip list | grep -q pygbag; then

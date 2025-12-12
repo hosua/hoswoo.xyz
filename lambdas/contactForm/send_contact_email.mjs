@@ -21,7 +21,6 @@ export const handler = async (event) => {
     TableName: table_name,
     Key: {
       ip,
-      email,
     },
   });
   const { Item } = await db.send(getItem);
@@ -55,6 +54,7 @@ export const handler = async (event) => {
       TableName: table_name,
       Item: {
         ip,
+        email,
         expire_at,
       },
     });

@@ -14,3 +14,5 @@ export const countVisitor = async ({ ip }: { ip: string }) => {
     throw new Error("Failed to count visitor IP!");
   }
 };
+
+export default countVisitor;

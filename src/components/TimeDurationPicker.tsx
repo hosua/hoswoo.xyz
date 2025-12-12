@@ -41,7 +41,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           }}
           min="0"
           max="59"
-          className="w-24"
+          className="w-14"
         />
       </div>
       <div className="space-y-2">
@@ -61,7 +61,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           }}
           min="0"
           max="23"
-          className="w-24"
+          className="w-14"
         />
       </div>
       <div className="space-y-2">
@@ -84,7 +84,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           }}
           min="0"
           max="1824"
-          className="w-24"
+          className="w-18"
         />
       </div>
     </div>

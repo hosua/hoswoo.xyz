@@ -51,7 +51,7 @@ export const UrlShortenerPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
+      <div className="mb-8 max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
           <Link2 size={40} />
           URL Shortener
@@ -64,7 +64,7 @@ export const UrlShortenerPage = () => {
           expiration greater than 5 years.
         </p>
       </div>
-      <div className="mt-6">
+      <div className="mt-6 max-w-2xl mx-auto">
         <h2 className="text-xl font-semibold mb-4">Expiration Time</h2>
         <TimeDurationPicker
           onChange={useCallback((timeDuration) => {
@@ -72,7 +72,7 @@ export const UrlShortenerPage = () => {
           }, [])}
         />
       </div>
-      <div className="max-w-2xl space-y-4 mt-6">
+      <div className="max-w-2xl mx-auto space-y-4 mt-6">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <Input
             type="url"

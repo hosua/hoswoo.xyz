@@ -7,6 +7,7 @@ import FlappyBirdPage from "@/pages/games/FlappyBirdPage";
 import TetriPyPage from "@/pages/games/TetriPyPage";
 import UrlShortenerPage from "@/pages/UrlShortenerPage";
 import UrlRedirectPage from "@/pages/UrlRedirectPage";
+import ContactPage from "@/pages/ContactPage";
 
 export const AppRoutes = () => {
   return (
@@ -18,6 +19,7 @@ export const AppRoutes = () => {
       <Route path="/games/flappy-bird" element={<FlappyBirdPage />} />
       <Route path="/games/tetripy" element={<TetriPyPage />} />
       <Route path="/url-shortener" element={<UrlShortenerPage />} />
+      <Route path="/contact" element={<ContactPage />} />
       <Route path="/s/:shortUrl" element={<UrlRedirectPage />} />
     </Routes>
   );

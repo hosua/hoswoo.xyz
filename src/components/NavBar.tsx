@@ -18,6 +18,9 @@ export const NavBar = () => {
         <Button variant="ghost" asChild>
           <Link to="/url-shortener">URL Shortener</Link>
         </Button>
+        <Button variant="ghost" asChild>
+          <Link to="/contact">Contact</Link>
+        </Button>
       </div>
       <ThemeSwitcher />
     </nav>

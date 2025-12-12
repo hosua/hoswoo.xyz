@@ -34,7 +34,7 @@ export const handler = async (event) => {
       Content: {
         Simple: {
           Subject: {
-            Data: `Contacrt form submissions from ${email}`,
+            Data: `Contact form submissions from ${email}`,
           },
           Body: {
             Text: {

@@ -20,7 +20,8 @@ export const sendContactEmail = async ({
   });
 
   if (!response.ok) {
-    throw new Error("Failed to send contact email!");
+    const msg = await response.json();
+    throw new Error(`Failed to send contact email! ${msg?.error}`);
   }
 };
 

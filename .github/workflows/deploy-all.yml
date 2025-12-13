@@ -1,0 +1,153 @@
+name: Deploy All
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy_frontend:
+    name: Deploy Frontend
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Build frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+        run: |
+          echo "Building frontend..."
+          npm install
+          npm run build
+
+      - name: Deploy
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          echo "Deploying frontend to S3..."
+          npm run deploy:frontend
+          echo "Done!"
+
+  deploy_games:
+    name: Deploy Games
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Setup emsdk
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install 4.0.20
+          ./emsdk activate 4.0.20
+          source ./emsdk_env.sh
+          emcc -v
+        shell: bash
+
+      - name: Verify emsdk
+        run: |
+          cd emsdk
+          source ./emsdk_env.sh
+          emcc -v
+        shell: bash
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install Python dependencies
+        run: |
+          pip install pygame pygbag
+
+      - name: Build all games
+        run: |
+          echo "Rebuilding all games..."
+          source ./emsdk/emsdk_env.sh
+          npm run clean-games
+          npm run build-games
+        shell: bash
+
+      - name: Verify all games built
+        run: |
+          echo "Verifying all games were built sucessfully..."
+                    
+          GAMES_DIR="./public/games"
+          MISSING_GAMES=()
+          
+          if [ ! -d "$GAMES_DIR/TetriPy/web" ] || [ ! -f "$GAMES_DIR/TetriPy/web/index.html" ]; then
+            MISSING_GAMES+=("TetriPy")
+          fi
+          if [ ! -d "$GAMES_DIR/FlapPy-bird/web" ] || [ ! -f "$GAMES_DIR/FlapPy-bird/web/index.html" ]; then
+            MISSING_GAMES+=("FlapPy-bird")
+          fi
+          if [ ! -d "$GAMES_DIR/sdl2-pathfinder" ] || [ ! -f "$GAMES_DIR/sdl2-pathfinder/index.html" ]; then
+            MISSING_GAMES+=("sdl2-pathfinder")
+          fi
+          if [ ! -d "$GAMES_DIR/SnakePlusPlus" ] || [ ! -f "$GAMES_DIR/SnakePlusPlus/index.html" ]; then
+            MISSING_GAMES+=("SnakePlusPlus")
+          fi
+          if [ ! -d "$GAMES_DIR/shermie-invaders" ] || [ ! -f "$GAMES_DIR/shermie-invaders/index.html" ]; then
+            MISSING_GAMES+=("shermie-invaders")
+          fi
+          
+          if [ ${#MISSING_GAMES[@]} -gt 0 ]; then
+            echo "ERROR: The following games failed to build:"
+            for game in "${MISSING_GAMES[@]}"; do
+              echo "  - $game"
+            done
+            exit 1
+          fi
+          
+          echo "All games built successfully!"
+
+      - name: Deploy
+        env:
+          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+        run: |
+          echo "Deploying games to S3..."
+          npm run deploy:games
+          echo "Done!"
+
+  deploy_lambdas:
+    name: Deploy Lambdas
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy Lambdas
+        env: 
+          LAMBDA_GET_URL: ${{ vars.LAMBDA_GET_URL }}
+          LAMBDA_URL_SHORTENER: ${{ vars.LAMBDA_URL_SHORTENER }}
+          LAMBDA_SEND_CONTACT_EMAIL: ${{ vars.LAMBDA_SEND_CONTACT_EMAIL }}
+          LAMBDA_IP_VISITOR_COUNTER: ${{ vars.LAMBDA_IP_VISITOR_COUNTER }}
+        run: |
+          npm install
+          npm run deploy:lambdas

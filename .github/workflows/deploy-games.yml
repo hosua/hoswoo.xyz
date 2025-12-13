@@ -19,13 +19,21 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Setup emsdk
-        uses: mymindstorm/setup-emsdk@v14
-        with:
-          version: 4.0.20
-          actions-cache-folder: 'emsdk-cache'
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          ./emsdk install 4.0.20
+          ./emsdk activate 4.0.20
+          source ./emsdk_env.sh
+          emcc -v
+        shell: bash
 
       - name: Verify emsdk
-        run: emcc -v
+        run: |
+          cd emsdk
+          source ./emsdk_env.sh
+          emcc -v
+        shell: bash
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -37,10 +45,12 @@ jobs:
           pip install pygame pygbag
 
       - name: Build all games
-        run:
+        run: |
           echo "Rebuilding all games..."
+          source ./emsdk/emsdk_env.sh
           npm run clean-games
           npm run build-games
+        shell: bash
 
       - name: Verify all games built
         run: |

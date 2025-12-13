@@ -69,7 +69,7 @@ export const ContactPage = () => {
               required
             />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 mb-2">
             <Label htmlFor="message">Message</Label>
             <div className="relative">
               <Textarea
@@ -78,7 +78,7 @@ export const ContactPage = () => {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 maxLength={MESSAGE_MAX_LENGTH}
-                className="min-h-32"
+                className="min-h-60 max-h-60"
                 disabled={loading}
                 required
               />
@@ -88,7 +88,7 @@ export const ContactPage = () => {
             </div>
           </div>
           <div className="flex justify-end">
-            <Button variant="secondary" type="submit" disabled={loading}>
+            <Button variant="default" type="submit" disabled={loading}>
               {loading ? "Sending..." : "Send Message"}
             </Button>
           </div>

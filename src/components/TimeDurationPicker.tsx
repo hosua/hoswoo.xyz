@@ -25,46 +25,6 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
   return (
     <div className="flex gap-4 items-end">
       <div className="space-y-2">
-        <Label htmlFor="minutes">Minutes</Label>
-        <Input
-          id="minutes"
-          type="number"
-          placeholder="0"
-          value={timeDuration?.minutes || 0}
-          onChange={(e) => {
-            const value = Number(e.target.value);
-            const clampedValue = Math.min(Math.max(value, 0), 59);
-            setTimeDuration({
-              ...timeDuration,
-              minutes: clampedValue,
-            });
-          }}
-          min="0"
-          max="59"
-          className="w-14"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label htmlFor="hours">Hours</Label>
-        <Input
-          id="hours"
-          type="number"
-          placeholder="0"
-          value={timeDuration?.hours || 0}
-          onChange={(e) => {
-            const value = Number(e.target.value);
-            const clampedValue = Math.min(Math.max(value, 0), 23);
-            setTimeDuration({
-              ...timeDuration,
-              hours: clampedValue,
-            });
-          }}
-          min="0"
-          max="23"
-          className="w-14"
-        />
-      </div>
-      <div className="space-y-2">
         <Label htmlFor="days">Days</Label>
         <Input
           id="days"
@@ -84,7 +44,47 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           }}
           min="0"
           max="1824"
-          className="w-18"
+          className="w-15"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="hours">Hours</Label>
+        <Input
+          id="hours"
+          type="number"
+          placeholder="0"
+          value={timeDuration?.hours || 0}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+            const clampedValue = Math.min(Math.max(value, 0), 23);
+            setTimeDuration({
+              ...timeDuration,
+              hours: clampedValue,
+            });
+          }}
+          min="0"
+          max="23"
+          className="w-11"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label htmlFor="minutes">Mins</Label>
+        <Input
+          id="minutes"
+          type="number"
+          placeholder="0"
+          value={timeDuration?.minutes || 0}
+          onChange={(e) => {
+            const value = Number(e.target.value);
+            const clampedValue = Math.min(Math.max(value, 0), 59);
+            setTimeDuration({
+              ...timeDuration,
+              minutes: clampedValue,
+            });
+          }}
+          min="0"
+          max="59"
+          className="w-11"
         />
       </div>
     </div>

@@ -83,7 +83,7 @@ export const UrlShortenerPage = () => {
             disabled={loading}
             required
           />
-          <Button variant="secondary" type="submit" disabled={loading}>
+          <Button variant="default" type="submit" disabled={loading}>
             {loading ? "Shortening..." : "Shorten"}
           </Button>
         </form>

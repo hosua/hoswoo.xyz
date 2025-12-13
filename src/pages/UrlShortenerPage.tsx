@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Link2, CheckCircle2, Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { shortenUrl } from "@/lib/urlShortener";
+import { Spinner } from "@/components/ui/spinner";
 import TimeDurationPicker from "@/components/TimeDurationPicker";
 import moment, { type Duration } from "moment";
 
@@ -104,7 +105,7 @@ export const UrlShortenerPage = () => {
             required
           />
           <Button variant="default" type="submit" disabled={loading}>
-            {loading ? "Shortening..." : "Shorten"}
+            {loading ? <Spinner /> : "Shorten"}
           </Button>
         </form>
 

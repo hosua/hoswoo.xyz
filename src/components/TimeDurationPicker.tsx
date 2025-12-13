@@ -11,9 +11,13 @@ interface TimeDuration {
 
 interface TimeDurationPickerProps {
   onChange: (timeDuration: TimeDuration) => void;
+  disabled?: boolean;
 }
 
-export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
+export const TimeDurationPicker = ({
+  onChange,
+  disabled = false,
+}: TimeDurationPickerProps) => {
   const [timeDuration, setTimeDuration] = useState<TimeDuration>({
     days: 1,
   });
@@ -45,6 +49,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           min="0"
           max="1824"
           className="w-15"
+          disabled={disabled}
         />
       </div>
       <div className="space-y-2">
@@ -65,6 +70,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           min="0"
           max="23"
           className="w-11"
+          disabled={disabled}
         />
       </div>
       <div className="space-y-2">
@@ -85,6 +91,7 @@ export const TimeDurationPicker = ({ onChange }: TimeDurationPickerProps) => {
           min="0"
           max="59"
           className="w-11"
+          disabled={disabled}
         />
       </div>
     </div>

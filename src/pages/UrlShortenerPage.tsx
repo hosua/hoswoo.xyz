@@ -2,6 +2,8 @@ import { useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Link2, CheckCircle2, Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import { shortenUrl } from "@/lib/urlShortener";
@@ -16,6 +18,7 @@ export const UrlShortenerPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
   const [expiration, setExpiration] = useState<Duration | null>(null);
+  const [noExpiration, setNoExpiration] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +29,11 @@ export const UrlShortenerPage = () => {
     try {
       // DynamoDB expects seconds for ttl but Date().getTime() returns ms, so
       // we'll just use ms as input, then convert it to s in the Lambda.
-      const ttl = expiration ? expiration.asMilliseconds() : MS_IN_DAY;
+      const ttl = noExpiration
+        ? 0
+        : expiration
+          ? expiration.asMilliseconds()
+          : MS_IN_DAY;
       const response = await shortenUrl({ originalUrl: url, ttl });
       const fullShortUrl = `${window.location.origin}/s/${response.short_url}`;
       setShortenedUrl(fullShortUrl);
@@ -65,11 +72,24 @@ export const UrlShortenerPage = () => {
         </p>
       </div>
       <div className="mt-6 max-w-2xl mx-auto">
-        <h2 className="text-xl font-semibold mb-4">Expiration Time</h2>
+        <div className="flex items-center gap-3 mb-4">
+          <h2 className="text-xl font-semibold">Expiration Time</h2>
+          <div className="flex items-center gap-2">
+            <Switch
+              id="no-expiration"
+              checked={noExpiration}
+              onCheckedChange={setNoExpiration}
+            />
+            <Label htmlFor="no-expiration" className="cursor-pointer">
+              Never expire
+            </Label>
+          </div>
+        </div>
         <TimeDurationPicker
           onChange={useCallback((timeDuration) => {
             setExpiration(moment.duration(timeDuration));
           }, [])}
+          disabled={noExpiration}
         />
       </div>
       <div className="max-w-2xl mx-auto space-y-4 mt-6">

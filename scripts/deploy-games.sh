@@ -7,11 +7,11 @@ if [ -f .env ]; then
   . .env
 fi
 
-BUILD_DIR="dist/"
+GAMES_DIR="public/games"
 
 S3_BUCKET_URI="s3://$BUCKET_NAME"
 
-if [ -d "$BUILD_DIR" ]; then
+if [ -d "$GAMES_DIR" ]; then
   echo "Configuring s3 bucket for static website hosting..."
   aws s3 website "$S3_BUCKET_URI" \
     --index-document index.html \
@@ -21,11 +21,10 @@ if [ -d "$BUILD_DIR" ]; then
   aws s3 rm "$S3_BUCKET_URI/games" \
     --recursive \
     --exclude "games/*"
-  pushd "$BUILD_DIR" || exit
 
   echo "Uploading games to s3..."
-  aws s3 cp games/ "$S3_BUCKET_URI/games" --recursive
+  aws s3 cp "$GAMES_DIR/" "$S3_BUCKET_URI/games" --recursive
 else
-  echo "Error: dist folder not found. Run npm build first!"
+  echo "Error: public/games folder not found. Run npm run build-games first!"
   exit 1
 fi

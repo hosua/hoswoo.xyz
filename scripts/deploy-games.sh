@@ -25,6 +25,6 @@ if [ -d "$GAMES_DIR" ]; then
   echo "Uploading games to s3..."
   aws s3 cp "$GAMES_DIR/" "$S3_BUCKET_URI/games" --recursive
 else
-  echo "Error: public/games folder not found. Run npm run build-games first!"
+  echo "Error: $GAMES_DIR folder not found. Run npm run build-games first!"
   exit 1
 fi

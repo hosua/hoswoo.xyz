@@ -3,11 +3,11 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
 import { publicIpv4 } from "public-ip";
 import { sendContactEmail } from "@/lib/sendContactEmail";
+import { Spinner } from "@/components/ui/spinner";
 
 const EMAIL_MAX_LENGTH = 254;
 const MESSAGE_MAX_LENGTH = 2000;
@@ -16,7 +16,7 @@ export const ContactPage = () => {
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
 
   const remainingChars = MESSAGE_MAX_LENGTH - message.length;
 
@@ -89,16 +89,10 @@ export const ContactPage = () => {
           </div>
           <div className="flex justify-end">
             <Button variant="default" type="submit" disabled={loading}>
-              {loading ? "Sending..." : "Send Message"}
+              {loading ? <Spinner /> : "Send Message"}
             </Button>
           </div>
         </form>
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
       </div>
     </div>
   );

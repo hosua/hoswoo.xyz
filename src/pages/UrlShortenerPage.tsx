@@ -16,7 +16,7 @@ const MS_IN_DAY = 24 * 60 * 60 * 1000;
 export const UrlShortenerPage = () => {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [, setError] = useState<string | null>(null);
   const [shortenedUrl, setShortenedUrl] = useState<string | null>(null);
   const [expiration, setExpiration] = useState<Duration | null>(null);
   const [noExpiration, setNoExpiration] = useState(false);
@@ -59,7 +59,7 @@ export const UrlShortenerPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="mb-8 max-w-2xl mx-auto">
+      <div className="mb-2 max-w-2xl mx-auto">
         <h1 className="text-4xl font-bold mb-2 flex items-center gap-3">
           <Link2 size={40} />
           URL Shortener
@@ -68,14 +68,13 @@ export const UrlShortenerPage = () => {
           Shorten your URLs quickly and easily.
         </p>
         <p className="text-muted-foreground">
-          URLs with an expiration of 0 will never expire and you cannot set an
-          expiration greater than 5 years.
+          You cannot set expiration greater than 5 years.
         </p>
       </div>
       <div className="mt-6 max-w-2xl mx-auto">
         <div className="flex items-center gap-3 mb-4">
           <h2 className="text-xl font-semibold">Expiration Time</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 ms-3 mt-1">
             <Switch
               id="no-expiration"
               checked={noExpiration}
@@ -108,12 +107,6 @@ export const UrlShortenerPage = () => {
             {loading ? <Spinner /> : "Shorten"}
           </Button>
         </form>
-
-        {error && (
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
 
         {shortenedUrl && (
           <div className="space-y-2">

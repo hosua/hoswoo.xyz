@@ -1,0 +1,626 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Metadata:
+  Generator: former2
+Description: ''
+Parameters:
+  RandomString:
+    Type: String
+    Description: 'Random string suffix for stack naming (e.g., use with stack name: hoswoo.xyz-{RANDOM_STRING})'
+    Default: ''
+  TableNameURLShortener:
+    Type: String
+    Description: DynamoDB table name for URL shortener
+    Default: short_url_table
+  TableNameRecentContacts:
+    Type: String
+    Description: DynamoDB table name for recent contacts
+    Default: recent_contacts
+  TableNameVisitorIPTracker:
+    Type: String
+    Description: DynamoDB table name for visitor IP tracker
+    Default: ip_visitor_table
+  LambdaFunctionNameURLShortener:
+    Type: String
+    Description: Lambda function name for URL shortener
+    Default: urlShortener
+  LambdaFunctionNameGetUrl:
+    Type: String
+    Description: Lambda function name for get URL
+    Default: getUrl
+  LambdaFunctionNameSendContactEmail:
+    Type: String
+    Description: Lambda function name for send contact email
+    Default: sendContactEmail
+  LambdaFunctionNameIPVisitorCounter:
+    Type: String
+    Description: Lambda function name for IP visitor counter
+    Default: ipVisitorCounter
+  S3BucketName:
+    Type: String
+    Description: S3 bucket name for static website
+    Default: hoswoo.xyz
+  DomainName:
+    Type: String
+    Description: Domain name for the website (used for CloudFront aliases and CORS)
+    Default: hoswoo.xyz
+  FromEmail:
+    Type: String
+    Description: Email address to send from (e.g., contact@hoswoo.xyz)
+  MyEmail:
+    Type: String
+    Description: Email address to receive contact form submissions
+  APIGateway:
+    Type: String
+    Description: API Gateway ID
+Resources:
+  
+  LambdaPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt lambdaIPVisitorTracker.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/visit-count
+
+  LambdaPermission2:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt lambaGetShortURL.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/*
+
+  LambdaPermission3:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt lambdaURLShortener.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/*
+
+  LambdaPermission4:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !GetAtt lambdaSendContactEmail.Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/send-contact-email
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    Properties:
+      DistributionConfig:
+        Aliases:
+          - !Sub www.${DomainName}
+          - !Ref DomainName
+        Origins:
+          - ConnectionAttempts: 3
+            ConnectionTimeout: 10
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginKeepaliveTimeout: 5
+              OriginProtocolPolicy: http-only
+              OriginReadTimeout: 30
+              OriginSSLProtocols:
+                - SSLv3
+                - TLSv1
+                - TLSv1.1
+                - TLSv1.2
+            DomainName: !Sub ${S3StaticWebsite}.s3-website-${AWS::Region}.amazonaws.com
+            Id: !Sub ${S3StaticWebsite}.s3.${AWS::Region}.amazonaws.com-mivhfvw6zjd
+            OriginPath: ''
+          - ConnectionAttempts: 3
+            ConnectionTimeout: 10
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginKeepaliveTimeout: 5
+              OriginProtocolPolicy: https-only
+              OriginReadTimeout: 30
+              OriginSSLProtocols:
+                - TLSv1.2
+            DomainName: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            Id: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            OriginPath: ''
+        DefaultCacheBehavior:
+          AllowedMethods:
+            - HEAD
+            - GET
+          CachedMethods:
+            - HEAD
+            - GET
+          Compress: true
+          CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+          SmoothStreaming: false
+          TargetOriginId: !Sub ${S3StaticWebsite}.s3.${AWS::Region}.amazonaws.com-mivhfvw6zjd
+          ViewerProtocolPolicy: redirect-to-https
+        CacheBehaviors:
+          - AllowedMethods:
+              - HEAD
+              - GET
+            Compress: true
+            CachePolicyId: 658327ea-f89d-4fab-a63d-7e88639e58f6
+            PathPattern: /url-shortener*
+            SmoothStreaming: false
+            TargetOriginId: !Sub ${S3StaticWebsite}.s3.${AWS::Region}.amazonaws.com-mivhfvw6zjd
+            ViewerProtocolPolicy: redirect-to-https
+          - AllowedMethods:
+              - HEAD
+              - DELETE
+              - POST
+              - GET
+              - OPTIONS
+              - PUT
+              - PATCH
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            PathPattern: /url?*
+            SmoothStreaming: false
+            TargetOriginId: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            ViewerProtocolPolicy: redirect-to-https
+          - AllowedMethods:
+              - HEAD
+              - DELETE
+              - POST
+              - GET
+              - OPTIONS
+              - PUT
+              - PATCH
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
+            PathPattern: /visit-counter*
+            SmoothStreaming: false
+            TargetOriginId: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            ViewerProtocolPolicy: redirect-to-https
+        Comment: My personal website
+        PriceClass: PriceClass_All
+        Enabled: true
+        ViewerCertificate:
+          AcmCertificateArn: !Sub arn:aws:acm:${AWS::Region}:${AWS::AccountId}:certificate/943cf9d4-0e05-435e-bdb6-b9aa216a37e9
+          CloudFrontDefaultCertificate: false
+          MinimumProtocolVersion: TLSv1.2_2021
+          SslSupportMethod: sni-only
+        Restrictions:
+          GeoRestriction:
+            RestrictionType: none
+        WebACLId: !Sub arn:aws:wafv2:${AWS::Region}:${AWS::AccountId}:global/webacl/CreatedByCloudFront-10e8f6ce/89638931-90dd-43e6-8d34-0e19f7701661
+        HttpVersion: http2
+        DefaultRootObject: ''
+        IPV6Enabled: true
+
+  ApiGatewayV2Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: $default
+      StageVariables: {}
+      ApiId: !Ref APIGateway
+      DeploymentId: e3ulkd
+      RouteSettings: {}
+      DefaultRouteSettings:
+        DetailedMetricsEnabled: false
+      AutoDeploy: true
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  ApiGatewayV2Route:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref APIGateway
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      RouteKey: GET /url
+      Target: !Sub integrations/${ApiGatewayV2Integration3}
+
+  ApiGatewayV2Route2:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref APIGateway
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      RouteKey: POST /visit-count
+      Target: !Sub integrations/${ApiGatewayV2Integration}
+
+  ApiGatewayV2Route3:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref APIGateway
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      RequestParameters: {}
+      RouteKey: POST /url
+      Target: !Sub integrations/${ApiGatewayV2Integration4}
+
+  ApiGatewayV2Route4:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref APIGateway
+      ApiKeyRequired: false
+      AuthorizationType: NONE
+      RouteKey: POST /send-contact-email
+      Target: !Sub integrations/${ApiGatewayV2Integration2}
+
+  ApiGatewayV2Integration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref APIGateway
+      ConnectionType: INTERNET
+      Description: IP visitor counter
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt lambdaIPVisitorTracker.Arn
+      TimeoutInMillis: 30000
+      PayloadFormatVersion: '2.0'
+
+  ApiGatewayV2Integration2:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref APIGateway
+      ConnectionType: INTERNET
+      Description: Send email via contact form
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt lambdaSendContactEmail.Arn
+      TimeoutInMillis: 30000
+      PayloadFormatVersion: '2.0'
+
+  ApiGatewayV2Integration3:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref APIGateway
+      ConnectionType: INTERNET
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt lambaGetShortURL.Arn
+      TimeoutInMillis: 30000
+      PayloadFormatVersion: '2.0'
+
+  ApiGatewayV2Integration4:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref APIGateway
+      ConnectionType: INTERNET
+      IntegrationMethod: POST
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt lambdaURLShortener.Arn
+      TimeoutInMillis: 30000
+      PayloadFormatVersion: '2.0'
+
+  IAMRole2:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      RoleName: ipVisitorCounter-role-maswz2y0
+      AssumeRolePolicyDocument: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - !Ref IAMXRayIPVisitorTracker
+        - !Ref IAMIPVisitorTrackerLambdaBasicExecutionRole
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  IAMRole3:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      RoleName: urlShortener-role-mwex3ibq
+      AssumeRolePolicyDocument: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - !Ref IAMURLShortenerLambdaBasicExecutionRole
+        - !Ref IAMXRayURLShortener
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  IAMRole4:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /service-role/
+      RoleName: sendContactEmail-role-u77lw0lq
+      AssumeRolePolicyDocument: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":{"Service":"lambda.amazonaws.com"},"Action":"sts:AssumeRole"}]}'
+      MaxSessionDuration: 3600
+      ManagedPolicyArns:
+        - !Ref IAMSendContactEmailLambdaBasicExeecutionRole
+        - !Ref IAMXRaySendContactEmail
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  tblRecentContactIPs:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: ip
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Sub '${TableNameRecentContacts}-${RandomString}'
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+      KeySchema:
+        - AttributeName: ip
+          KeyType: HASH
+
+  tblVisitorIPTracker:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: ip
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Sub '${TableNameVisitorIPTracker}-${RandomString}'
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+      KeySchema:
+        - AttributeName: ip
+          KeyType: HASH
+
+  tblURLShortener:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: short_url
+          AttributeType: S
+      BillingMode: PAY_PER_REQUEST
+      TableName: !Sub '${TableNameURLShortener}-${RandomString}'
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+      KeySchema:
+        - AttributeName: short_url
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: expire_at
+        Enabled: true
+
+  lambdaURLShortener:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: ''
+      Environment:
+        Variables:
+          region: !Ref AWS::Region
+          table_name: !Ref tblURLShortener
+      FunctionName: !Sub '${LambdaFunctionNameURLShortener}-${RandomString}'
+      Handler: url_shortener.handler
+      Architectures:
+        - x86_64
+      Code:
+        S3Bucket: prod-04-2014-tasks
+        S3Key: !Sub /snapshots/${AWS::AccountId}/urlShortener-f255f1bf-97b0-4c40-9835-79f0ce3d362e
+        S3ObjectVersion: _OJpi_5lHLWzZU9GhaTcRt0rjbOeCTcj
+      MemorySize: 128
+      Role: !GetAtt IAMRole3.Arn
+      Runtime: nodejs24.x
+      Timeout: 3
+      TracingConfig:
+        Mode: Active
+      EphemeralStorage:
+        Size: 512
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  lambaGetShortURL:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: ''
+      Environment:
+        Variables:
+          region: !Ref AWS::Region
+          table_name: !Ref tblURLShortener
+      FunctionName: !Sub '${LambdaFunctionNameGetUrl}-${RandomString}'
+      Handler: get_url.handler
+      Architectures:
+        - x86_64
+      Code:
+        S3Bucket: prod-04-2014-tasks
+        S3Key: !Sub /snapshots/${AWS::AccountId}/getUrl-db81c1fa-1e6f-45c9-8074-801ad69294f6
+        S3ObjectVersion: 9CeMM2MVjbiRbCZZoTD11mgigXHVslSv
+      MemorySize: 128
+      Role: !GetAtt IAMRole3.Arn
+      Runtime: nodejs24.x
+      Timeout: 3
+      TracingConfig:
+        Mode: Active
+      EphemeralStorage:
+        Size: 512
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  lambdaSendContactEmail:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: ''
+      Environment:
+        Variables:
+          from_email: !Ref FromEmail
+          my_email: !Ref MyEmail
+          region: !Ref AWS::Region
+          table_name: !Ref tblRecentContactIPs
+      FunctionName: !Sub '${LambdaFunctionNameSendContactEmail}-${RandomString}'
+      Handler: send_contact_email.handler
+      Architectures:
+        - x86_64
+      Code:
+        S3Bucket: prod-04-2014-tasks
+        S3Key: !Sub /snapshots/${AWS::AccountId}/sendContactEmail-c76595f8-5032-4e86-b81d-96cc5119a6ba
+        S3ObjectVersion: dUTwIgRpyCPSSwIqHqOK782UXVSqbQGt
+      MemorySize: 128
+      Role: !GetAtt IAMRole4.Arn
+      Runtime: nodejs24.x
+      Timeout: 3
+      TracingConfig:
+        Mode: Active
+      EphemeralStorage:
+        Size: 512
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+  lambdaIPVisitorTracker:
+    Type: AWS::Lambda::Function
+    Properties:
+      Description: ''
+      Environment:
+        Variables:
+          region: !Ref AWS::Region
+          table_name: !Ref tblVisitorIPTracker
+      FunctionName: !Sub '${LambdaFunctionNameIPVisitorCounter}-${RandomString}'
+      Handler: ip_visitor_counter.handler
+      Architectures:
+        - x86_64
+      Code:
+        S3Bucket: prod-04-2014-tasks
+        S3Key: !Sub /snapshots/${AWS::AccountId}/ipVisitorCounter-e8605dc4-75cb-4edf-987b-f0ef58b3eb35
+        S3ObjectVersion: fFVp0pquueODd5rYcL8.2MiiC0tpWiAu
+      MemorySize: 128
+      Role: !GetAtt IAMRole2.Arn
+      Runtime: nodejs24.x
+      Timeout: 3
+      TracingConfig:
+        Mode: Active
+      EphemeralStorage:
+        Size: 512
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+
+  S3StaticWebsite:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub '${S3BucketName}-${RandomString}'
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''
+      WebsiteConfiguration:
+        IndexDocument: index.html
+        ErrorDocument: index.html
+      OwnershipControls:
+        Rules:
+          - ObjectOwnership: BucketOwnerEnforced
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: false
+        BlockPublicPolicy: false
+
+  IAMXRayURLShortener:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaTracerAccessExecutionRole-a27f50c4-9e91-4753-b4df-4834338851ef
+      Path: /service-role/
+      PolicyDocument: |
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "xray:PutTraceSegments",
+                        "xray:PutTelemetryRecords"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }
+
+  IAMXRayIPVisitorTracker:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaTracerAccessExecutionRole-566913fc-5a07-463f-a7b2-212314f4e21f
+      Path: /service-role/
+      PolicyDocument: |
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "xray:PutTraceSegments",
+                        "xray:PutTelemetryRecords"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }
+
+  IAMXRaySendContactEmail:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaTracerAccessExecutionRole-22039b33-3815-4899-9395-44f136d26594
+      Path: /service-role/
+      PolicyDocument: |
+        {
+            "Version": "2012-10-17",
+            "Statement": [
+                {
+                    "Effect": "Allow",
+                    "Action": [
+                        "xray:PutTraceSegments",
+                        "xray:PutTelemetryRecords"
+                    ],
+                    "Resource": "*"
+                }
+            ]
+        }
+
+  IAMSendContactEmailLambdaBasicExeecutionRole:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaBasicExecutionRole-97e44c1c-3582-4150-b6f9-895593f4066a
+      Path: /service-role/
+      PolicyDocument:
+        Fn::Sub: '{"Version":"2012-10-17","Statement":[{"Sid":"VisualEditor0","Effect":"Allow","Action":["ses:SendEmail","dynamodb:PutItem","dynamodb:GetItem","logs:CreateLogGroup"],"Resource":["arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tblRecentContactIPs}","arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*","arn:aws:ses:*:${AWS::AccountId}:template/*","arn:aws:ses:*:${AWS::AccountId}:identity/*","arn:aws:ses:*:${AWS::AccountId}:configuration-set/*"]},{"Sid":"VisualEditor1","Effect":"Allow","Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":"arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionNameSendContactEmail}-${RandomString}:*"}]}'
+
+  IAMIPVisitorTrackerLambdaBasicExecutionRole:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaBasicExecutionRole-29dc778c-10bf-4a40-941a-ff9321980c7f
+      Path: /service-role/
+      PolicyDocument:
+        Fn::Sub: '{"Version":"2012-10-17","Statement":[{"Sid":"VisualEditor0","Effect":"Allow","Action":["dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem","logs:CreateLogGroup"],"Resource":["arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*","arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tblVisitorIPTracker}"]},{"Sid":"VisualEditor1","Effect":"Allow","Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":"arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionNameIPVisitorCounter}-${RandomString}:*"}]}'
+
+  IAMURLShortenerLambdaBasicExecutionRole:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: AWSLambdaBasicExecutionRole-87db144d-169e-4e16-a6a4-66c38ac66dbf
+      Path: /service-role/
+      PolicyDocument:
+        Fn::Sub: '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Action":"logs:CreateLogGroup","Resource":"arn:aws:logs:${AWS::Region}:${AWS::AccountId}:*"},{"Effect":"Allow","Action":["logs:CreateLogStream","logs:PutLogEvents"],"Resource":["arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionNameURLShortener}-${RandomString}:*","arn:aws:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/${LambdaFunctionNameGetUrl}-${RandomString}:*"]},{"Effect":"Allow","Action":["dynamodb:PutItem","dynamodb:GetItem"],"Resource":"arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tblURLShortener}"}]}'
+
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: hoswoo-oac
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  APIGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      ApiKeySelectionExpression: $request.header.x-api-key
+      ProtocolType: HTTP
+      RouteSelectionExpression: $request.method $request.path
+      CorsConfiguration:
+        AllowCredentials: false
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - GET
+          - POST
+        AllowOrigins:
+          - !Sub https://${DomainName}
+          - !Sub https://www.${DomainName}
+          - !Sub https://api.${DomainName}
+        MaxAge: 0
+      DisableExecuteApiEndpoint: true
+      Tags:
+        - Key: !Ref DomainName
+          Value: ''

@@ -49,9 +49,6 @@ Parameters:
   MyEmail:
     Type: String
     Description: Email address to receive contact form submissions
-  APIGateway:
-    Type: String
-    Description: API Gateway ID
 Resources:
   
   LambdaPermission:
@@ -60,7 +57,9 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt lambdaIPVisitorTracker.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/visit-count
+      SourceArn: !Sub
+        - 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/visit-count'
+        - ApiId: !Ref APIGateway
 
   LambdaPermission2:
     Type: AWS::Lambda::Permission
@@ -68,7 +67,9 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt lambaGetShortURL.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/*
+      SourceArn: !Sub
+        - 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*'
+        - ApiId: !Ref APIGateway
 
   LambdaPermission3:
     Type: AWS::Lambda::Permission
@@ -76,7 +77,9 @@ Resources:
       Action: lambda:InvokeFunction
       FunctionName: !GetAtt lambdaURLShortener.Arn
       Principal: apigateway.amazonaws.com
-      SourceArn: !Sub arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${APIGateway}/*/*/*
+      SourceArn: !Sub
+        - 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiId}/*/*/*'
+        - ApiId: !Ref APIGateway
 
   LambdaPermission4:
     Type: AWS::Lambda::Permission
@@ -120,8 +123,12 @@ Resources:
               OriginReadTimeout: 30
               OriginSSLProtocols:
                 - TLSv1.2
-            DomainName: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
-            Id: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            DomainName: !Sub
+              - '${ApiId}.execute-api.${AWS::Region}.amazonaws.com'
+              - ApiId: !Ref APIGateway
+            Id: !Sub
+              - '${ApiId}.execute-api.${AWS::Region}.amazonaws.com'
+              - ApiId: !Ref APIGateway
             OriginPath: ''
         DefaultCacheBehavior:
           AllowedMethods:
@@ -158,7 +165,9 @@ Resources:
             OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
             PathPattern: /url?*
             SmoothStreaming: false
-            TargetOriginId: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            TargetOriginId: !Sub
+              - '${ApiId}.execute-api.${AWS::Region}.amazonaws.com'
+              - ApiId: !Ref APIGateway
             ViewerProtocolPolicy: redirect-to-https
           - AllowedMethods:
               - HEAD
@@ -173,7 +182,9 @@ Resources:
             OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac
             PathPattern: /visit-counter*
             SmoothStreaming: false
-            TargetOriginId: !Sub ${APIGateway}.execute-api.${AWS::Region}.amazonaws.com
+            TargetOriginId: !Sub
+              - '${ApiId}.execute-api.${AWS::Region}.amazonaws.com'
+              - ApiId: !Ref APIGateway
             ViewerProtocolPolicy: redirect-to-https
         Comment: My personal website
         PriceClass: PriceClass_All
@@ -618,7 +629,6 @@ Resources:
         AllowOrigins:
           - !Sub https://${DomainName}
           - !Sub https://www.${DomainName}
-          - !Sub https://api.${DomainName}
         MaxAge: 0
       DisableExecuteApiEndpoint: true
       Tags:

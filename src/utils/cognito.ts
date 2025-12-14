@@ -28,12 +28,6 @@ const getLogoutURL = (): string =>
   `https://${getUserPoolDomain()}/logout?client_id=${getClientId()}&logout_uri=${encodeURIComponent(getLogoutURI())}`;
 
 const getCognitoAuthConfig = () => {
-  const requiredEnvVars = ["ID", "CLIENT_ID", "LOGIN_URI", "LOGOUT_URI"];
-
-  for (const envVar of requiredEnvVars)
-    if (!COGNITO[envVar])
-      console.error(`Missing required cognito variable ${envVar}!`);
-
   const authority = getCognitoAuthUrl();
   const redirectUri = getLoginURI();
 
@@ -42,7 +36,7 @@ const getCognitoAuthConfig = () => {
     metadataUrl: `${authority}/.well-known/openid-configuration`,
     client_id: COGNITO.CLIENT_ID,
     redirect_uri: redirectUri,
-    post_logout_redirect_uri: redirectUri, // Use same callback for both
+    post_logout_redirect_uri: redirectUri,
     response_type: "code",
     scope: "phone openid email",
     automaticSilentRenew: true,

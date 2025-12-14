@@ -8,7 +8,6 @@ export const COGNITO: Record<string, string> = {
   CUSTOM_DOMAIN: metaEnv.VITE_COGNITO_CUSTOM_DOMAIN || "",
   LOGIN_URI: metaEnv.VITE_COGNITO_LOGIN_URI || "",
   LOGOUT_URI: metaEnv.VITE_COGNITO_LOGOUT_URI || "",
-  USER_POOL_ID: metaEnv.VITE_COGNITO_USER_POOL_ID || "",
 };
 
 export const REGION = metaEnv.VITE_REGION || "";

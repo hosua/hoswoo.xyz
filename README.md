@@ -10,6 +10,7 @@ This repo is the source code for my personal website, hosted on AWS.
 - Games I have developed over the years in C++, JavaScript, and Python
 - Serverless URL shortener, built with API Gateway, DynamoDB, and Lambda
 - Counter to track visitor counts by IP address that also uses API Gateway, DynamoDB, and Lambda
+- Login auth implemented using Cognito User Pools
 
 #### Games
 

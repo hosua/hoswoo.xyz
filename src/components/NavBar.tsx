@@ -1,19 +1,36 @@
-import { Link } from "react-router-dom";
-import * as oidc from "react-oidc-context";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Button } from "@components/ui/button";
+import { useEffect } from "react";
+import * as oidc from "react-oidc-context";
 import * as cognito from "@utils/cognito";
 
 export const NavBar = () => {
   const auth = oidc.useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const getUsername = (): string => {
     if (!auth.user?.profile) return "user";
     const username = auth.user.profile["cognito:username"];
-    return (typeof username === "string" ? username : null) || "user";
+    return (
+      (typeof username === "string" ? username : null) || "unknown username"
+    );
   };
 
   const username = getUsername();
+  const preferredUsername = auth.user?.profile?.["preferred_username"];
+
+  useEffect(() => {
+    if (
+      auth.isAuthenticated &&
+      username?.startsWith("google_") &&
+      !preferredUsername &&
+      location.pathname !== "/rename-user"
+    ) {
+      navigate("/rename-user");
+    }
+  }, [username, preferredUsername, auth.isAuthenticated, location.pathname, navigate]);
 
   const handleSignIn = async () => {
     try {

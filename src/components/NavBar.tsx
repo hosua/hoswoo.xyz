@@ -7,6 +7,14 @@ import * as cognito from "@utils/cognito";
 export const NavBar = () => {
   const auth = oidc.useAuth();
 
+  const getUsername = (): string => {
+    if (!auth.user?.profile) return "user";
+    const username = auth.user.profile["cognito:username"];
+    return (typeof username === "string" ? username : null) || "user";
+  };
+
+  const username = getUsername();
+
   const handleSignIn = async () => {
     try {
       await auth.signinRedirect();
@@ -26,13 +34,6 @@ export const NavBar = () => {
       console.error("Sign out error:", error);
       window.location.reload();
     }
-  };
-
-  // Extract username from user object
-  const getUsername = (): string => {
-    if (!auth.user?.profile) return "user";
-    const username = auth.user.profile["cognito:username"];
-    return (typeof username === "string" ? username : null) || "user";
   };
 
   return (
@@ -58,7 +59,7 @@ export const NavBar = () => {
         {auth.isAuthenticated ? (
           <>
             <span className="text-sm text-muted-foreground">
-              Signed in as: {getUsername()}
+              Signed in as: {username}
             </span>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out

@@ -5,6 +5,7 @@ export const API_BASE_URL = metaEnv.VITE_API_BASE_URL || "";
 export const COGNITO: Record<string, string> = {
   ID: metaEnv.VITE_COGNITO_ID || "",
   CLIENT_ID: metaEnv.VITE_COGNITO_CLIENT_ID || "",
+  CUSTOM_DOMAIN: metaEnv.VITE_COGNITO_CUSTOM_DOMAIN || "",
   LOGIN_URI: metaEnv.VITE_COGNITO_LOGIN_URI || "",
   LOGOUT_URI: metaEnv.VITE_COGNITO_LOGOUT_URI || "",
   USER_POOL_ID: metaEnv.VITE_COGNITO_USER_POOL_ID || "",

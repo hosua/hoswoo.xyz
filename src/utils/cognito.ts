@@ -4,8 +4,8 @@ import { isProd } from "@src/lib/env";
 const getUserPoolId = () =>
   `https://cognito-idp.${REGION}.amazonaws.com/${REGION}_${COGNITO.ID}`;
 
-// TODO: add a custom subdomain in hosted zone for this
 const getUserPoolDomain = () =>
+  COGNITO.CUSTOM_DOMAIN ||
   `${REGION}${COGNITO.ID}.auth.${REGION}.amazoncognito.com`;
 
 const getClientId = () => COGNITO.CLIENT_ID;

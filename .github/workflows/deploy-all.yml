@@ -22,6 +22,13 @@ jobs:
       - name: Build frontend
         env:
           VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
+          VITE_REGION: ${{ secrets.VITE_REGION }}
+          VITE_COGNITO_ID: ${{ secrets.VITE_COGNITO_ID }}
+          VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID }}
+          VITE_COGNITO_CUSTOM_DOMAIN: ${{ secrets.VITE_COGNITO_CUSTOM_DOMAIN }}
+          VITE_COGNITO_LOGIN_URI: ${{ secrets.VITE_COGNITO_LOGIN_URI }}
+          VITE_COGNITO_LOGOUT_URI: ${{ secrets.VITE_COGNITO_LOGOUT_URI }}
+          VITE_COGNITO_USER_POOL_ID: ${{ secrets.VITE_COGNITO_USER_POOL_ID }}
         run: |
           echo "Building frontend..."
           npm install

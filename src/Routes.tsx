@@ -1,13 +1,13 @@
 import { Routes, Route } from "react-router-dom";
-import GamesPage from "@/pages/GamesPage";
-import ShermieInvadersPage from "@/pages/games/ShermieInvadersPage";
-import SDL2PathfinderPage from "@/pages/games/SDL2PathfinderPage";
-import SnakePlusPlusPage from "@/pages/games/SnakePlusPlusPage";
-import FlappyBirdPage from "@/pages/games/FlappyBirdPage";
-import TetriPyPage from "@/pages/games/TetriPyPage";
-import UrlShortenerPage from "@/pages/UrlShortenerPage";
-import UrlRedirectPage from "@/pages/UrlRedirectPage";
-import ContactPage from "@/pages/ContactPage";
+import GamesPage from "@pages/GamesPage";
+import ShermieInvadersPage from "@pages/games/ShermieInvadersPage";
+import SDL2PathfinderPage from "@pages/games/SDL2PathfinderPage";
+import SnakePlusPlusPage from "@pages/games/SnakePlusPlusPage";
+import FlappyBirdPage from "@pages/games/FlappyBirdPage";
+import TetriPyPage from "@pages/games/TetriPyPage";
+import UrlShortenerPage from "@pages/UrlShortenerPage";
+import UrlRedirectPage from "@pages/UrlRedirectPage";
+import ContactPage from "@pages/ContactPage";
 
 export const AppRoutes = () => {
   return (

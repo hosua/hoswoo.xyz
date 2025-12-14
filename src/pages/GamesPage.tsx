@@ -1,5 +1,5 @@
 import { Gamepad2 } from "lucide-react";
-import GameCard from "@/components/GameCard";
+import GameCard from "@components/GameCard";
 export const GamesPage = () => {
   return (
     <div className="container mx-auto px-4 py-8">

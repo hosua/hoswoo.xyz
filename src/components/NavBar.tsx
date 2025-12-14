@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
-import ThemeSwitcher from "./ThemeSwitcher";
-import { Button } from "./ui/button";
+import ThemeSwitcher from "@components/ThemeSwitcher";
+import { Button } from "@components/ui/button";
 
 export const NavBar = () => {
   return (

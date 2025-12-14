@@ -6,9 +6,9 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useTheme } from "@/components/theme-provider";
+} from "@components/ui/dropdown-menu";
+import { Button } from "@components/ui/button";
+import { useTheme } from "@components/theme-provider";
 
 export const ThemeSwitcher = () => {
   const [open, setOpen] = useState(false);

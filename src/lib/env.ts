@@ -1,1 +1,17 @@
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
+const metaEnv = import.meta.env;
+
+export const API_BASE_URL = metaEnv.VITE_API_BASE_URL || "";
+
+export const COGNITO: Record<string, string> = {
+  ID: metaEnv.VITE_COGNITO_ID || "",
+  CLIENT_ID: metaEnv.VITE_COGNITO_CLIENT_ID || "",
+  LOGIN_URI: metaEnv.VITE_COGNITO_LOGIN_URI || "",
+  LOGOUT_URI: metaEnv.VITE_COGNITO_LOGOUT_URI || "",
+  USER_POOL_ID: metaEnv.VITE_COGNITO_USER_POOL_ID || "",
+};
+
+export const REGION = metaEnv.VITE_REGION || "";
+
+export type ENV = "PROD" | "DEV";
+export const getEnv = (): ENV => (metaEnv.PROD ? "PROD" : "DEV");
+export const isProd = (): boolean => getEnv() === "PROD";

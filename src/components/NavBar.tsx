@@ -1,8 +1,20 @@
 import { Link } from "react-router-dom";
+import * as oidc from "react-oidc-context";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Button } from "@components/ui/button";
+import * as cognito from "@utils/cognito";
 
 export const NavBar = () => {
+  const auth = oidc.useAuth();
+
+  const handleSignIn = () => {
+    window.location.href = cognito.getLoginURL();
+  };
+
+  const handleSignOut = () => {
+    window.location.href = cognito.getLogoutURL();
+  };
+
   return (
     <nav className="flex items-center justify-between border-b px-4 py-3">
       <div className="flex items-center gap-2">
@@ -22,7 +34,18 @@ export const NavBar = () => {
           <Link to="/contact">Contact</Link>
         </Button>
       </div>
-      <ThemeSwitcher />
+      <div className="flex items-center gap-2">
+        {auth.isAuthenticated ? (
+          <Button variant="outline" onClick={handleSignOut}>
+            Sign Out
+          </Button>
+        ) : (
+          <Button variant="default" onClick={handleSignIn}>
+            Sign In
+          </Button>
+        )}
+        <ThemeSwitcher />
+      </div>
     </nav>
   );
 };

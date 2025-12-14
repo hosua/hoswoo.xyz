@@ -1,18 +1,56 @@
-export const getCognitoAuthConfig = () => {
-  const requiredEnvVars = [
-    "COGNITO_CLIENT_ID",
-    "COGNITO_AUTH_URL",
-    "COGNITO_LOGIN_URI",
-    "COGNITO_LOGOUT_URI",
-  ];
+import { REGION, COGNITO } from "@src/lib/env";
+import { isProd } from "@src/lib/env";
 
-  console.log(process.env);
+const getUserPoolId = () =>
+  `https://cognito-idp.${REGION}.amazonaws.com/${REGION}_${COGNITO.ID}`;
+
+// TODO: add a custom subdomain in hosted zone for this
+const getUserPoolDomain = () =>
+  `${REGION}${COGNITO.ID}.auth.${REGION}.amazoncognito.com`;
+
+const getClientId = () => COGNITO.CLIENT_ID;
+
+const getCognitoAuthUrl = () =>
+  `https://cognito-idp.${REGION}.amazonaws.com/${getUserPoolId()}`;
+
+const getTokenSigningKeyUrl = () =>
+  `https://cognito-idp.${REGION}.amazonaws.com/${getUserPoolId()}/.well-known/jwks.json`;
+
+const getLoginURI = (): string =>
+  isProd() ? COGNITO.LOGIN_URI : "http://localhost:5173";
+
+const getLoginURL = (): string =>
+  `https://${getUserPoolDomain()}/login?client_id=${getClientId()}&response_type=code&scope=email+openid+phone&redirect_uri=${encodeURIComponent(getLoginURI())}`;
+
+const getLogoutURI = (): string =>
+  isProd() ? COGNITO.LOGOUT_URI : "http://localhost:5173";
+
+const getLogoutURL = (): string =>
+  `https://${getUserPoolDomain()}/logout?client_id=${getClientId()}&logout_uri=${encodeURIComponent(getLogoutURI())}`;
+
+const getCognitoAuthConfig = () => {
+  const requiredEnvVars = ["ID", "CLIENT_ID", "LOGIN_URI", "LOGOUT_URI"];
+
+  for (const envVar of requiredEnvVars)
+    if (!COGNITO[envVar])
+      console.error(`Missing required cognito variable ${envVar}!`);
 
   return {
-    authority: "",
-    client_id: "770381dt1fu84dcmiflphmle3h",
-    redirect_uri: "https://hoswoo.xyz",
-    response_type: "code",
+    authority: getCognitoAuthUrl(),
+    client_id: COGNITO.CLIENT_ID,
+    redirect_uri: COGNITO.LOGIN_URI,
+    response_type: COGNITO.LOGOUT_URI,
     scope: "phone openid email",
   };
+};
+
+export {
+  getUserPoolId,
+  getUserPoolDomain,
+  getCognitoAuthUrl,
+  getClientId,
+  getLoginURL,
+  getLogoutURL,
+  getTokenSigningKeyUrl,
+  getCognitoAuthConfig,
 };

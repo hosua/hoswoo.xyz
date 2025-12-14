@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useTheme } from "@/components/theme-provider";
+import { useTheme } from "@components/theme-provider";
 
 import { ReactComponent as GithubLightIcon } from "./github-light.svg";
 import { ReactComponent as GithubDarkIcon } from "./github-dark.svg";

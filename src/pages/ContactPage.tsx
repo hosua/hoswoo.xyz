@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { Input } from "@components/ui/input";
+import { Textarea } from "@components/ui/textarea";
+import { Label } from "@components/ui/label";
+import { Button } from "@components/ui/button";
 import { Mail } from "lucide-react";
 import { toast } from "sonner";
 import { publicIpv4 } from "public-ip";
-import { sendContactEmail } from "@/lib/sendContactEmail";
-import { Spinner } from "@/components/ui/spinner";
+import { sendContactEmail } from "@lib/sendContactEmail";
+import { Spinner } from "@components/ui/spinner";
 
 const EMAIL_MAX_LENGTH = 254;
 const MESSAGE_MAX_LENGTH = 2000;

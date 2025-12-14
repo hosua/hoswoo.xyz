@@ -1,14 +1,14 @@
 import { useState, useCallback } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Button } from "@components/ui/button";
+import { Input } from "@components/ui/input";
+import { Alert, AlertDescription } from "@components/ui/alert";
+import { Switch } from "@components/ui/switch";
+import { Label } from "@components/ui/label";
 import { Link2, CheckCircle2, Copy, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
-import { shortenUrl } from "@/lib/urlShortener";
-import { Spinner } from "@/components/ui/spinner";
-import TimeDurationPicker from "@/components/TimeDurationPicker";
+import { shortenUrl } from "@lib/urlShortener";
+import { Spinner } from "@components/ui/spinner";
+import TimeDurationPicker from "@components/TimeDurationPicker";
 import moment, { type Duration } from "moment";
 
 const MS_IN_DAY = 24 * 60 * 60 * 1000;

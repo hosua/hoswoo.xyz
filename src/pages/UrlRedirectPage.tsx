@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { getOriginalUrl } from "@/lib/urlShortener";
+import { Alert, AlertDescription } from "@components/ui/alert";
+import { getOriginalUrl } from "@lib/urlShortener";
 import { Loader2 } from "lucide-react";
 
 export const UrlRedirectPage = () => {

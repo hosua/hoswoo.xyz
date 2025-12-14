@@ -6,9 +6,9 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@components/ui/card";
 
-import CustomIcon, { type IconName } from "@/icons";
+import CustomIcon, { type IconName } from "@icons/index";
 
 interface GameCardProps {
   to: string;

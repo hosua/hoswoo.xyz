@@ -22,28 +22,17 @@ export const NavBar = () => {
       // Redirect to Cognito's logout endpoint
       window.location.href = cognito.getLogoutURL();
     } catch (error) {
-      console.error("Sign out error:", error);
       // Fallback: just reload the page
+      console.error("Sign out error:", error);
       window.location.reload();
     }
   };
 
   // Extract username from user object
-  const getUsername = () => {
-    if (!auth.user) return null;
-    // Cognito stores username in 'cognito:username' custom claim in the ID token
-    // Check both profile and the ID token claims
-    const profile = auth.user.profile || {};
-    const idTokenClaims = (auth.user as any)?.id_token_claims || {};
-    
-    return (
-      profile["cognito:username"] ||
-      idTokenClaims["cognito:username"] ||
-      profile.username ||
-      profile.preferred_username ||
-      idTokenClaims.preferred_username ||
-      "User"
-    );
+  const getUsername = (): string => {
+    if (!auth.user?.profile) return "user";
+    const username = auth.user.profile["cognito:username"];
+    return (typeof username === "string" ? username : null) || "user";
   };
 
   return (

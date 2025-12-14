@@ -3,16 +3,38 @@ import * as oidc from "react-oidc-context";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Button } from "@components/ui/button";
 import * as cognito from "@utils/cognito";
+import { isProd } from "@src/lib/env";
 
 export const NavBar = () => {
   const auth = oidc.useAuth();
 
-  const handleSignIn = () => {
-    window.location.href = cognito.getLoginURL();
+  const handleSignIn = async () => {
+    try {
+      await auth.signinRedirect();
+    } catch (error) {
+      console.error("Sign in error:", error);
+    }
   };
 
-  const handleSignOut = () => {
-    window.location.href = cognito.getLogoutURL();
+  const handleSignOut = async () => {
+    try {
+      // Clear the OIDC session
+      await auth.removeUser();
+      
+      if (isProd()) {
+        // In production, redirect to Cognito's logout endpoint
+        // Note: Make sure the logout URI is in "Allowed sign-out URLs" in Cognito
+        window.location.href = cognito.getLogoutURL();
+      } else {
+        // In local dev, just reload the page after clearing session
+        // (Cognito logout requires the URI to be in allowed sign-out URLs)
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Fallback: just reload the page
+      window.location.reload();
+    }
   };
 
   return (
@@ -40,7 +62,7 @@ export const NavBar = () => {
             Sign Out
           </Button>
         ) : (
-          <Button variant="default" onClick={handleSignIn}>
+          <Button variant="outline" onClick={handleSignIn}>
             Sign In
           </Button>
         )}

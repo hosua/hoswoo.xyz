@@ -36,6 +36,15 @@ function App() {
   }
 
   if (auth.error) {
+    // If it's a state mismatch error, try to recover by clearing and redirecting
+    if (auth.error.message?.includes("No matching state")) {
+      console.warn("State mismatch detected, clearing storage and retrying...");
+      // Clear any stale state and reload
+      sessionStorage.clear();
+      localStorage.removeItem("oidc.user:" + window.location.origin);
+      window.location.href = window.location.pathname;
+      return <Spinner />;
+    }
     return <div>Encountering error... {auth.error.message}</div>;
   }
 

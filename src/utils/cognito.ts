@@ -1,8 +1,7 @@
 import { REGION, COGNITO } from "@src/lib/env";
 import { isProd } from "@src/lib/env";
 
-const getUserPoolId = () =>
-  `https://cognito-idp.${REGION}.amazonaws.com/${REGION}_${COGNITO.ID}`;
+const getUserPoolId = () => `${REGION}_${COGNITO.ID}`;
 
 const getUserPoolDomain = () =>
   COGNITO.CUSTOM_DOMAIN ||
@@ -35,12 +34,25 @@ const getCognitoAuthConfig = () => {
     if (!COGNITO[envVar])
       console.error(`Missing required cognito variable ${envVar}!`);
 
+  const authority = getCognitoAuthUrl();
+  const redirectUri = getLoginURI();
+
   return {
-    authority: getCognitoAuthUrl(),
+    authority,
+    metadataUrl: `${authority}/.well-known/openid-configuration`,
     client_id: COGNITO.CLIENT_ID,
-    redirect_uri: COGNITO.LOGIN_URI,
-    response_type: COGNITO.LOGOUT_URI,
+    redirect_uri: redirectUri,
+    post_logout_redirect_uri: redirectUri, // Use same callback for both
+    response_type: "code",
     scope: "phone openid email",
+    automaticSilentRenew: true,
+    loadUserInfo: false,
+    // Use sessionStorage for state management (more reliable for OIDC flows)
+    userStore: undefined, // Use default sessionStorage
+    onSigninCallback: () => {
+      // Clean up the URL after sign-in to prevent state mismatch on refresh
+      window.history.replaceState({}, document.title, window.location.pathname);
+    },
   };
 };
 

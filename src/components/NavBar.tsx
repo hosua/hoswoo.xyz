@@ -3,7 +3,6 @@ import * as oidc from "react-oidc-context";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Button } from "@components/ui/button";
 import * as cognito from "@utils/cognito";
-import { isProd } from "@src/lib/env";
 
 export const NavBar = () => {
   const auth = oidc.useAuth();
@@ -20,21 +19,31 @@ export const NavBar = () => {
     try {
       // Clear the OIDC session
       await auth.removeUser();
-      
-      if (isProd()) {
-        // In production, redirect to Cognito's logout endpoint
-        // Note: Make sure the logout URI is in "Allowed sign-out URLs" in Cognito
-        window.location.href = cognito.getLogoutURL();
-      } else {
-        // In local dev, just reload the page after clearing session
-        // (Cognito logout requires the URI to be in allowed sign-out URLs)
-        window.location.reload();
-      }
+      // Redirect to Cognito's logout endpoint
+      window.location.href = cognito.getLogoutURL();
     } catch (error) {
       console.error("Sign out error:", error);
       // Fallback: just reload the page
       window.location.reload();
     }
+  };
+
+  // Extract username from user object
+  const getUsername = () => {
+    if (!auth.user) return null;
+    // Cognito stores username in 'cognito:username' custom claim in the ID token
+    // Check both profile and the ID token claims
+    const profile = auth.user.profile || {};
+    const idTokenClaims = (auth.user as any)?.id_token_claims || {};
+    
+    return (
+      profile["cognito:username"] ||
+      idTokenClaims["cognito:username"] ||
+      profile.username ||
+      profile.preferred_username ||
+      idTokenClaims.preferred_username ||
+      "User"
+    );
   };
 
   return (
@@ -58,9 +67,14 @@ export const NavBar = () => {
       </div>
       <div className="flex items-center gap-2">
         {auth.isAuthenticated ? (
-          <Button variant="outline" onClick={handleSignOut}>
-            Sign Out
-          </Button>
+          <>
+            <span className="text-sm text-muted-foreground">
+              Signed in as: {getUsername()}
+            </span>
+            <Button variant="outline" onClick={handleSignOut}>
+              Sign Out
+            </Button>
+          </>
         ) : (
           <Button variant="outline" onClick={handleSignIn}>
             Sign In

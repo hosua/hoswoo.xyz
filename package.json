@@ -9,7 +9,7 @@
     "clean-games": "rm -rf public/games; rm -rf games",
     "build-games": "bash scripts/build-games.sh",
     "build": "tsc -b && vite build",
-    "deploy:frontend": "npm run build && bash scripts/deploy-frontend.sh",
+    "deploy:frontend": "bash scripts/deploy-frontend.sh",
     "deploy:lambdas": "bash scripts/deploy-lambdas.sh",
     "deploy:games": "bash scripts/deploy-games.sh",
     "invalidate-cloudfront-cache": "bash scripts/invalidate-cloudfront-cache.sh",

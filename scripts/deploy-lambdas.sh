@@ -6,6 +6,12 @@ if [ -f ".env" ]; then
   . .env
 fi
 
+LAMBDA_GET_URL=getUrl
+LAMBDA_URL_SHORTENER=urlShortener
+LAMBDA_IP_VISITOR_COUNTER=ipVisitorCounter
+LAMBDA_SEND_CONTACT_EMAIL=sendContactEmail
+LAMBDA_RENAME_COGNITO_USER=renameCognitoUser
+
 pushd lambdas || exit
 
 # Deploy url shortener lambdas
@@ -51,6 +57,15 @@ aws lambda update-function-code \
 rm ./*.zip
 popd
 
+pushd renameCognitoUser || exit
+zip rename_cognito_username.zip rename_cognito_username.mjs
+aws lambda update-function-code \
+  --function-name "$LAMBDA_RENAME_COGNITO_USER" \
+  --zip-file fileb://rename_cognito_username.zip \
+  --no-cli-pager
+rm ./*.zip
+popd
+
 echo "Publishing uploaded lambdas..."
 aws lambda wait function-updated \
   --function-name "$LAMBDA_GET_URL" &&
@@ -74,6 +89,12 @@ aws lambda wait function-updated \
   --function-name "$LAMBDA_SEND_CONTACT_EMAIL" &&
   aws lambda publish-version \
     --function-name "$LAMBDA_SEND_CONTACT_EMAIL" \
+    --no-cli-pager
+
+aws lambda wait function-updated \
+  --function-name "$LAMBDA_RENAME_COGNITO_USER" &&
+  aws lambda publish-version \
+    --function-name "$LAMBDA_RENAME_COGNITO_USER" \
     --no-cli-pager
 
 echo "Finished uploading and publishing all lambdas!"

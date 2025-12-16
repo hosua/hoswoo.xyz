@@ -22,6 +22,7 @@ export const NavBar = () => {
   const preferredUsername = auth.user?.profile?.["preferred_username"];
 
   useEffect(() => {
+    console.log(auth.user);
     if (
       auth.isAuthenticated &&
       username?.startsWith("google_") &&
@@ -30,7 +31,19 @@ export const NavBar = () => {
     ) {
       navigate("/rename-user");
     }
-  }, [username, preferredUsername, auth.isAuthenticated, location.pathname, navigate]);
+  }, [
+    username,
+    preferredUsername,
+    auth.isAuthenticated,
+    location.pathname,
+    navigate,
+  ]);
+
+  useEffect(() => {
+    if (auth.error) {
+      console.error("OIDC error from provider:", auth.error);
+    }
+  }, [auth.error]);
 
   const handleSignIn = async () => {
     try {

@@ -31,7 +31,8 @@ function App() {
     if (auth.error) {
       sessionStorage.clear();
       localStorage.removeItem("oidc.user:" + window.location.origin);
-      window.location.href = "/";
+      console.log(auth.error);
+      // window.location.href = "/";
     }
   }, [auth.error]);
 

@@ -13,13 +13,13 @@ const getCognitoAuthUrl = () =>
   `https://cognito-idp.${REGION}.amazonaws.com/${getUserPoolId()}`;
 
 const getTokenSigningKeyUrl = () =>
-  `https://cognito-idp.${REGION}.amazonaws.com/${getUserPoolId()}/.well-known/jwks.json`;
+  `${getCognitoAuthUrl()}/.well-known/jwks.json`;
 
 const getLoginURI = (): string =>
   isProd() ? COGNITO.LOGIN_URI : "http://localhost:5173";
 
 const getLoginURL = (): string =>
-  `https://${getUserPoolDomain()}/login?client_id=${getClientId()}&response_type=code&scope=email+openid+phone&redirect_uri=${encodeURIComponent(getLoginURI())}`;
+  `https://${getUserPoolDomain()}/login?client_id=${getClientId()}&response_type=code&scope=email+openid+phone+profile&redirect_uri=${encodeURIComponent(getLoginURI())}`;
 
 const getLogoutURI = (): string =>
   isProd() ? COGNITO.LOGOUT_URI : "http://localhost:5173";
@@ -38,7 +38,7 @@ const getCognitoAuthConfig = () => {
     redirect_uri: redirectUri,
     post_logout_redirect_uri: redirectUri,
     response_type: "code",
-    scope: "phone openid email",
+    scope: "phone openid email profile",
     automaticSilentRenew: true,
     loadUserInfo: false,
     // Use sessionStorage for state management (more reliable for OIDC flows)

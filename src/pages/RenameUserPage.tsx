@@ -22,6 +22,8 @@ export const RenameUserPage = () => {
       auth.user.profile["cognito:username"]) ||
     "unknown username";
 
+  console.log(JSON.stringify(auth.user, null, 2));
+
   const remainingChars = USERNAME_MAX_LENGTH - username.length;
 
   const validateUsername = (value: string): string | null => {

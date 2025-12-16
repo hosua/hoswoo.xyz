@@ -8,36 +8,26 @@ import * as cognito from "@utils/cognito";
 export const NavBar = () => {
   const auth = oidc.useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+
+  const userProfile = auth.user?.profile;
+  const realUsername = userProfile?.["cognito:username"];
+  const preferredUsername = userProfile?.preferred_username || "";
 
   const getUsername = (): string => {
-    if (!auth.user?.profile) return "user";
-    const username = auth.user.profile["cognito:username"];
-    return (
-      (typeof username === "string" ? username : null) || "unknown username"
-    );
+    if (!userProfile) return "";
+    const username = preferredUsername || realUsername || "";
+    return username as string;
   };
 
-  const username = getUsername();
-  const preferredUsername = auth.user?.profile?.["preferred_username"];
+  const isGoogleUserNotRenamed =
+    auth.isAuthenticated &&
+    (realUsername as string)?.includes(preferredUsername);
+
+  const displayUsername = getUsername();
 
   useEffect(() => {
-    console.log(auth.user);
-    if (
-      auth.isAuthenticated &&
-      username?.startsWith("google_") &&
-      !preferredUsername &&
-      location.pathname !== "/rename-user"
-    ) {
-      navigate("/rename-user");
-    }
-  }, [
-    username,
-    preferredUsername,
-    auth.isAuthenticated,
-    location.pathname,
-    navigate,
-  ]);
+    if (isGoogleUserNotRenamed) navigate("/rename-user");
+  }, [isGoogleUserNotRenamed, navigate]);
 
   useEffect(() => {
     if (auth.error) {
@@ -55,12 +45,9 @@ export const NavBar = () => {
 
   const handleSignOut = async () => {
     try {
-      // Clear the OIDC session
       await auth.removeUser();
-      // Redirect to Cognito's logout endpoint
       window.location.href = cognito.getLogoutURL();
     } catch (error) {
-      // Fallback: just reload the page
       console.error("Sign out error:", error);
       window.location.reload();
     }
@@ -89,7 +76,7 @@ export const NavBar = () => {
         {auth.isAuthenticated ? (
           <>
             <span className="text-sm text-muted-foreground">
-              Signed in as: {username}
+              Signed in as: {displayUsername}
             </span>
             <Button variant="outline" onClick={handleSignOut}>
               Sign Out

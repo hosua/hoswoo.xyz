@@ -31,14 +31,6 @@ const getCognitoAuthConfig = () => {
   const authority = getCognitoAuthUrl();
   const redirectUri = getLoginURI();
 
-  // Debug logging
-  console.log("🔍 Cognito Config Debug:", {
-    CUSTOM_DOMAIN: COGNITO.CUSTOM_DOMAIN,
-    getUserPoolDomain: getUserPoolDomain(),
-    authority,
-    redirectUri,
-  });
-
   return {
     authority,
     metadataUrl: `${authority}/.well-known/openid-configuration`,

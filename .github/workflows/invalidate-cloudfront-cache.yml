@@ -11,28 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Validate required secrets
-        run: |
-          MISSING_SECRETS=()
-          
-          # AWS secrets
-          [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && MISSING_SECRETS+=("AWS_ACCESS_KEY_ID")
-          [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && MISSING_SECRETS+=("AWS_SECRET_ACCESS_KEY")
-          [ -z "${{ secrets.AWS_REGION }}" ] && MISSING_SECRETS+=("AWS_REGION")
-          
-          # CloudFront secret
-          [ -z "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ] && MISSING_SECRETS+=("CLOUDFRONT_DISTRIBUTION_ID")
-          
-          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
-            echo "ERROR: The following required secrets are missing:"
-            for secret in "${MISSING_SECRETS[@]}"; do
-              echo "  - $secret"
-            done
-            exit 1
-          fi
-          
-          echo "All required secrets are defined!"
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -40,7 +18,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Fetch SSM parameters
+        run: |
+          SSM_BASE="/hoswoo.xyz"
+
+          echo "Fetching parameters from SSM Parameter Store..."
+
+          echo "CLOUDFRONT_DISTRIBUTION_ID=$(aws ssm get-parameter --name "$SSM_BASE/cloudfront_distribution_id" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+
+          echo "All SSM parameters fetched successfully!"
+
       - name: Invlidate CloudFront Cache
         env: 
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
         run: npm run invalidate-cloudfront-cache

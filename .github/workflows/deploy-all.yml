@@ -217,25 +217,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Fetch SSM parameters
-        run: |
-          SSM_BASE="/hoswoo.xyz"
-
-          echo "Fetching parameters from SSM Parameter Store..."
-
-          echo "LAMBDA_GET_URL=$(aws ssm get-parameter --name "$SSM_BASE/lambda/get_url" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
-          echo "LAMBDA_URL_SHORTENER=$(aws ssm get-parameter --name "$SSM_BASE/lambda/url_shortener" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
-          echo "LAMBDA_SEND_CONTACT_EMAIL=$(aws ssm get-parameter --name "$SSM_BASE/lambda/send_contact_email" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
-          echo "LAMBDA_IP_VISITOR_COUNTER=$(aws ssm get-parameter --name "$SSM_BASE/lambda/ip_visitor_counter" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
-
-          echo "All SSM parameters fetched successfully!"
-
       - name: Deploy Lambdas
-        env: 
-          LAMBDA_GET_URL: ${{ env.LAMBDA_GET_URL }}
-          LAMBDA_URL_SHORTENER: ${{ env.LAMBDA_URL_SHORTENER }}
-          LAMBDA_SEND_CONTACT_EMAIL: ${{ env.LAMBDA_SEND_CONTACT_EMAIL }}
-          LAMBDA_IP_VISITOR_COUNTER: ${{ env.LAMBDA_IP_VISITOR_COUNTER }}
         run: |
           npm install
           npm run deploy:lambdas

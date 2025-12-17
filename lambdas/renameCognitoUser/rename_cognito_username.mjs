@@ -19,7 +19,5 @@ export const handler = async (event, context) => {
       },
     ],
   });
-  const res = await cognitoClient.send(cmd);
-  console.log(res);
-  return res;
+  return await cognitoClient.send(cmd);
 };

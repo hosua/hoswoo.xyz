@@ -13,8 +13,6 @@ export const NavBar = () => {
   const realUsername = userProfile?.["cognito:username"];
   const preferredUsername = userProfile?.preferred_username || "";
 
-  console.log(userProfile);
-
   const getUsername = (): string => {
     if (!userProfile) return "";
     const username = preferredUsername || realUsername || "";

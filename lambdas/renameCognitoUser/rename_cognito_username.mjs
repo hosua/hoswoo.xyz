@@ -8,7 +8,7 @@ const cognitoClient = new CognitoIdentityProviderClient({});
 const { user_pool_id } = process.env;
 
 export const handler = async (event, context) => {
-  const { originalUsername, newUsername } = event;
+  const { originalUsername, newUsername } = JSON.parse(event.body || {});
   const cmd = new AdminUpdateUserAttributesCommand({
     UserPoolId: user_pool_id,
     Username: originalUsername,
@@ -19,5 +19,7 @@ export const handler = async (event, context) => {
       },
     ],
   });
-  return await cognitoClient.send(cmd);
+  const res = await cognitoClient.send(cmd);
+  console.log(res);
+  return res;
 };

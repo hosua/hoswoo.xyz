@@ -6,6 +6,8 @@ import { User } from "lucide-react";
 import { Spinner } from "@components/ui/spinner";
 import * as oidc from "react-oidc-context";
 
+import { renameCognitoUsername } from "@src/lib/renameCognitoUser";
+
 const USERNAME_MIN_LENGTH = 3;
 const USERNAME_MAX_LENGTH = 20;
 const USERNAME_PATTERN = /^[a-zA-Z0-9_-]+$/;
@@ -15,14 +17,11 @@ export const RenameUserPage = () => {
   const [username, setUsername] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const currentUsername =
-    (typeof auth.user?.profile?.["cognito:preferred_username"] === "string" &&
-      auth.user.profile["cognito:preferred_username"]) ||
-    (typeof auth.user?.profile?.["cognito:username"] === "string" &&
-      auth.user.profile["cognito:username"]) ||
-    "unknown username";
 
-  console.log(JSON.stringify(auth.user, null, 2));
+  const userProfile = auth.user?.profile;
+  const realUsername = userProfile?.["cognito:username"] as string;
+  const preferredUsername = userProfile?.preferred_username || "";
+  const currentUsername = preferredUsername || realUsername;
 
   const remainingChars = USERNAME_MAX_LENGTH - username.length;
 
@@ -51,9 +50,12 @@ export const RenameUserPage = () => {
     setLoading(true);
 
     try {
-      // TODO: Call API gateway
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Would update username to:", username);
+      await renameCognitoUsername({
+        originalUsername: realUsername,
+        newUsername: username,
+      });
+      await auth.removeUser();
+      await auth.signinRedirect();
     } catch (err) {
       const errorMessage =
         err instanceof Error

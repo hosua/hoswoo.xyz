@@ -1,4 +1,4 @@
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import ThemeSwitcher from "@components/ThemeSwitcher";
 import { Button } from "@components/ui/button";
 import { useEffect } from "react";
@@ -12,6 +12,8 @@ export const NavBar = () => {
   const userProfile = auth.user?.profile;
   const realUsername = userProfile?.["cognito:username"];
   const preferredUsername = userProfile?.preferred_username || "";
+
+  console.log(userProfile);
 
   const getUsername = (): string => {
     if (!userProfile) return "";

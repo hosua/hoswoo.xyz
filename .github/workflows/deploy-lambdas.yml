@@ -11,42 +11,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Validate required secrets and variables
-        run: |
-          MISSING_SECRETS=()
-          MISSING_VARS=()
-          
-          # AWS secrets
-          [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && MISSING_SECRETS+=("AWS_ACCESS_KEY_ID")
-          [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && MISSING_SECRETS+=("AWS_SECRET_ACCESS_KEY")
-          [ -z "${{ secrets.AWS_REGION }}" ] && MISSING_SECRETS+=("AWS_REGION")
-          
-          # Lambda variables
-          [ -z "${{ vars.LAMBDA_GET_URL }}" ] && MISSING_VARS+=("LAMBDA_GET_URL")
-          [ -z "${{ vars.LAMBDA_URL_SHORTENER }}" ] && MISSING_VARS+=("LAMBDA_URL_SHORTENER")
-          [ -z "${{ vars.LAMBDA_SEND_CONTACT_EMAIL }}" ] && MISSING_VARS+=("LAMBDA_SEND_CONTACT_EMAIL")
-          [ -z "${{ vars.LAMBDA_IP_VISITOR_COUNTER }}" ] && MISSING_VARS+=("LAMBDA_IP_VISITOR_COUNTER")
-          
-          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
-            echo "ERROR: The following required secrets are missing:"
-            for secret in "${MISSING_SECRETS[@]}"; do
-              echo "  - $secret"
-            done
-          fi
-          
-          if [ ${#MISSING_VARS[@]} -gt 0 ]; then
-            echo "ERROR: The following required variables are missing:"
-            for var in "${MISSING_VARS[@]}"; do
-              echo "  - $var"
-            done
-          fi
-          
-          if [ ${#MISSING_SECRETS[@]} -gt 0 ] || [ ${#MISSING_VARS[@]} -gt 0 ]; then
-            exit 1
-          fi
-          
-          echo "All required secrets and variables are defined!"
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -54,10 +18,23 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Fetch SSM parameters
+        run: |
+          SSM_BASE="/hoswoo.xyz"
+
+          echo "Fetching parameters from SSM Parameter Store..."
+
+          echo "LAMBDA_GET_URL=$(aws ssm get-parameter --name "$SSM_BASE/lambda/get_url" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "LAMBDA_URL_SHORTENER=$(aws ssm get-parameter --name "$SSM_BASE/lambda/url_shortener" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "LAMBDA_SEND_CONTACT_EMAIL=$(aws ssm get-parameter --name "$SSM_BASE/lambda/send_contact_email" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "LAMBDA_IP_VISITOR_COUNTER=$(aws ssm get-parameter --name "$SSM_BASE/lambda/ip_visitor_counter" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+
+          echo "All SSM parameters fetched successfully!"
+
       - name: Deploy Lambdas
         env: 
-          LAMBDA_GET_URL: ${{ vars.LAMBDA_GET_URL }}
-          LAMBDA_URL_SHORTENER: ${{ vars.LAMBDA_URL_SHORTENER }}
-          LAMBDA_URL_SEND_CONTACT_EMAIL: ${{ vars.LAMBDA_SEND_CONTACT_EMAIL }}
-          LAMBDA_IP_VISITOR_COUNTER: ${{ vars.LAMBDA_IP_VISITOR_COUNTER }}
+          LAMBDA_GET_URL: ${{ env.LAMBDA_GET_URL }}
+          LAMBDA_URL_SHORTENER: ${{ env.LAMBDA_URL_SHORTENER }}
+          LAMBDA_SEND_CONTACT_EMAIL: ${{ env.LAMBDA_SEND_CONTACT_EMAIL }}
+          LAMBDA_IP_VISITOR_COUNTER: ${{ env.LAMBDA_IP_VISITOR_COUNTER }}
         run: npm run deploy:lambdas

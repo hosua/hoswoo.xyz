@@ -12,25 +12,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Validate required secrets
-        run: |
-          MISSING_SECRETS=()
-          
-          # AWS secrets
-          [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ] && MISSING_SECRETS+=("AWS_ACCESS_KEY_ID")
-          [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && MISSING_SECRETS+=("AWS_SECRET_ACCESS_KEY")
-          [ -z "${{ secrets.AWS_REGION }}" ] && MISSING_SECRETS+=("AWS_REGION")
-          
-          if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
-            echo "ERROR: The following required secrets are missing:"
-            for secret in "${MISSING_SECRETS[@]}"; do
-              echo "  - $secret"
-            done
-            exit 1
-          fi
-          
-          echo "All required secrets are defined!"
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:

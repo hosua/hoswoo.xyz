@@ -20,18 +20,6 @@ jobs:
           [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ] && MISSING_SECRETS+=("AWS_SECRET_ACCESS_KEY")
           [ -z "${{ secrets.AWS_REGION }}" ] && MISSING_SECRETS+=("AWS_REGION")
           
-          # Frontend build secrets
-          [ -z "${{ secrets.VITE_API_BASE_URL }}" ] && MISSING_SECRETS+=("VITE_API_BASE_URL")
-          [ -z "${{ secrets.VITE_REGION }}" ] && MISSING_SECRETS+=("VITE_REGION")
-          [ -z "${{ secrets.VITE_COGNITO_ID }}" ] && MISSING_SECRETS+=("VITE_COGNITO_ID")
-          [ -z "${{ secrets.VITE_COGNITO_CLIENT_ID }}" ] && MISSING_SECRETS+=("VITE_COGNITO_CLIENT_ID")
-          [ -z "${{ secrets.VITE_COGNITO_LOGIN_URI }}" ] && MISSING_SECRETS+=("VITE_COGNITO_LOGIN_URI")
-          [ -z "${{ secrets.VITE_COGNITO_LOGOUT_URI }}" ] && MISSING_SECRETS+=("VITE_COGNITO_LOGOUT_URI")
-          
-          # Deploy secrets
-          [ -z "${{ secrets.BUCKET_NAME }}" ] && MISSING_SECRETS+=("BUCKET_NAME")
-          [ -z "${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}" ] && MISSING_SECRETS+=("CLOUDFRONT_DISTRIBUTION_ID")
-          
           if [ ${#MISSING_SECRETS[@]} -gt 0 ]; then
             echo "ERROR: The following required secrets are missing:"
             for secret in "${MISSING_SECRETS[@]}"; do
@@ -49,16 +37,33 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
+      - name: Fetch SSM parameters
+        run: |
+          SSM_BASE="/hoswoo.xyz"
+
+          echo "Fetching parameters from SSM Parameter Store..."
+
+          echo "VITE_API_BASE_URL=$(aws ssm get-parameter --name "$SSM_BASE/api_base_url" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_REGION=$(aws ssm get-parameter --name "$SSM_BASE/region" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_COGNITO_ID=$(aws ssm get-parameter --name "$SSM_BASE/cognito/id" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_COGNITO_CLIENT_ID=$(aws ssm get-parameter --name "$SSM_BASE/cognito/client_id" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_COGNITO_CUSTOM_DOMAIN=$(aws ssm get-parameter --name "$SSM_BASE/cognito/custom_domain" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_COGNITO_LOGIN_URI=$(aws ssm get-parameter --name "$SSM_BASE/cognito/login_uri" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "VITE_COGNITO_LOGOUT_URI=$(aws ssm get-parameter --name "$SSM_BASE/cognito/logout_uri" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "BUCKET_NAME=$(aws ssm get-parameter --name "$SSM_BASE/s3_bucket_name" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+          echo "CLOUDFRONT_DISTRIBUTION_ID=$(aws ssm get-parameter --name "$SSM_BASE/cloudfront_distribution_id" --query "Parameter.Value" --output text)" >> $GITHUB_ENV
+
+          echo "All SSM parameters fetched successfully!"
+
       - name: Build frontend
         env:
-          VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
-          VITE_REGION: ${{ secrets.VITE_REGION }}
-          VITE_COGNITO_ID: ${{ secrets.VITE_COGNITO_ID }}
-          VITE_COGNITO_CLIENT_ID: ${{ secrets.VITE_COGNITO_CLIENT_ID }}
-          VITE_COGNITO_CUSTOM_DOMAIN: ${{ secrets.VITE_COGNITO_CUSTOM_DOMAIN }}
-          VITE_COGNITO_LOGIN_URI: ${{ secrets.VITE_COGNITO_LOGIN_URI }}
-          VITE_COGNITO_LOGOUT_URI: ${{ secrets.VITE_COGNITO_LOGOUT_URI }}
-          VITE_COGNITO_USER_POOL_ID: ${{ secrets.VITE_COGNITO_USER_POOL_ID }}
+          VITE_API_BASE_URL: ${{ env.VITE_API_BASE_URL }}
+          VITE_REGION: ${{ env.VITE_REGION }}
+          VITE_COGNITO_ID: ${{ env.VITE_COGNITO_ID }}
+          VITE_COGNITO_CLIENT_ID: ${{ env.VITE_COGNITO_CLIENT_ID }}
+          VITE_COGNITO_CUSTOM_DOMAIN: ${{ env.VITE_COGNITO_CUSTOM_DOMAIN }}
+          VITE_COGNITO_LOGIN_URI: ${{ env.VITE_COGNITO_LOGIN_URI }}
+          VITE_COGNITO_LOGOUT_URI: ${{ env.VITE_COGNITO_LOGOUT_URI }}
         run: |
           echo "Building frontend..."
           npm install
@@ -66,8 +71,8 @@ jobs:
 
       - name: Deploy
         env:
-          BUCKET_NAME: ${{ secrets.BUCKET_NAME }}
-          CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }}
+          BUCKET_NAME: ${{ env.BUCKET_NAME }}
+          CLOUDFRONT_DISTRIBUTION_ID: ${{ env.CLOUDFRONT_DISTRIBUTION_ID }}
 
         run: | 
           echo "Deploying frontend to S3..."

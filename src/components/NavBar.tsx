@@ -10,8 +10,8 @@ export const NavBar = () => {
   const navigate = useNavigate();
 
   const userProfile = auth.user?.profile;
-  const realUsername = userProfile?.["cognito:username"];
-  const preferredUsername = userProfile?.preferred_username || "";
+  const realUsername = userProfile?.["cognito:username"] as string;
+  const preferredUsername = userProfile?.preferred_username as string;
 
   const getUsername = (): string => {
     if (!userProfile) return "";
@@ -21,7 +21,8 @@ export const NavBar = () => {
 
   const isGoogleUserNotRenamed =
     auth.isAuthenticated &&
-    (realUsername as string)?.includes(preferredUsername);
+    realUsername?.startsWith("google_") &&
+    !preferredUsername;
 
   const displayUsername = getUsername();
 
